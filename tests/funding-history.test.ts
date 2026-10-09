@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import {fundingSeries,fundingDomains} from "../lib/funding-history";
+import {fundingSeries,fundingDomains,annualizedFundingRate,historicalFundingSummary} from "../lib/funding-history";
 import {cachedHistory} from "../lib/exchanges/history-cache";
 import type {HistoryResult} from "../lib/exchanges/types";
 
@@ -15,6 +15,21 @@ assert.equal(fundingSeries([input[0]])[0].cumulativeRatePercent,-.04); // New wi
 assert.equal(fundingSeries([...input,input[0]]).length,4); // Duplicate settlement is never charged twice.
 assert.equal(fundingSeries([]).length,0);
 assert.equal(fundingSeries([{time:1,rate:NaN,intervalHours:1}]).length,0);
+// Annualization weights actual settlement hours, rather than averaging 1h / 8h observations equally.
+const summary=historicalFundingSummary([...input,input[0]]);
+assert.equal(summary.sampleHours,13);assert.equal(summary.unknownPeriodCount,1);
+assert.ok(Math.abs(summary.averageHourlyRate!-.0005/13)<1e-12);
+assert.ok(Math.abs(summary.annualizedRate!-.0005/13*8760)<1e-12);
+for(const days of [1,7,30]){
+ const points=Array.from({length:days*24},(_,i)=>({time:(i+1)*3600000,rate:-.00001,intervalHours:1}));
+ const window=historicalFundingSummary(points);
+ assert.equal(window.sampleHours,days*24);
+ assert.ok(Math.abs(window.annualizedRate!+.0876)<1e-12);
+}
+assert.equal(historicalFundingSummary([{time:1,rate:0,intervalHours:8}]).annualizedRate,0);
+assert.equal(historicalFundingSummary([]).annualizedRate,null);
+assert.equal(historicalFundingSummary([{time:1,rate:.01,intervalHours:null},{time:2,rate:.01,intervalHours:0},{time:3,rate:.01,intervalHours:-1},{time:4,rate:.01,intervalHours:Infinity}]).annualizedRate,null);
+assert.equal(annualizedFundingRate(null),null);assert.equal(annualizedFundingRate(NaN),null);assert.equal(annualizedFundingRate(Infinity),null);assert.equal(annualizedFundingRate(Number.MAX_VALUE),null);
 const domains=fundingDomains(series);
 const zero=(d:[number,number])=>-d[0]/(d[1]-d[0]);
 assert.ok(Math.abs(zero(domains.rate)-zero(domains.cumulative))<1e-12);
@@ -36,4 +51,4 @@ const retry=async():Promise<HistoryResult>=>{attempts++;if(attempts===1)throw Er
 await assert.rejects(cachedHistory("test","GIGADEV",7,retry,now));
 await cachedHistory("test","GIGADEV",7,retry,now);
 assert.equal(attempts,2);
-console.log("PASS: raw signed cumulative payments, window reset, deduplication, aligned axes, hourly cache, concurrent reads, retry after failure");
+console.log("PASS: signed payments, weighted historical annualization, 24h/7d/30d windows, unknown periods, deduplication, aligned axes, hourly cache, concurrent reads, retry after failure");

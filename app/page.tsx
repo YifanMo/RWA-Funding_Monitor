@@ -8,7 +8,8 @@ import { exchangeInfo } from "@/lib/exchanges/exchange-info";
 import type { Contract, Feed, HistoryPoint } from "@/lib/exchanges/types";
 import { CrossExchangeMonitor } from "@/components/cross-exchange-monitor";
 import { FundingHistoryChart } from "@/components/funding-history-chart";
-import { fundingSeries } from "@/lib/funding-history";
+import { fundingSeries, historicalFundingSummary } from "@/lib/funding-history";
+import { HistoricalAnnualizedReturn } from "@/components/historical-annualized-return";
 import { inMarketScope, matchesStockQuery, stockIdentity, stockMetadata } from "@/lib/exchanges/stock-metadata";
 
 type Market = "CN" | "HK" | "US";
@@ -33,7 +34,8 @@ export default function Home(){
  const openCross=useCallback(()=>{setVenue("all");setMode("cross");},[]);
  const [snapshot,setSnapshot]=useState<Snapshot|null>(null),[loading,setLoading]=useState(true),[fetchError,setFetchError]=useState("");
  const [market,setMarket]=useState("CN"),[venue,setVenue]=useState("all"),[query,setQuery]=useState(""),[sort,setSort]=useState("rate-desc");
- const [selected,setSelected]=useState("hyperliquid:xyz:CXMT"),[range,setRange]=useState("7"),[history,setHistory]=useState<HistoryPoint[]>([]),[historyLoading,setHistoryLoading]=useState(false),[historyError,setHistoryError]=useState("");
+ const [selected,setSelected]=useState("hyperliquid:xyz:CXMT"),[range,setRange]=useState("7"),[loadedHistory,setHistory]=useState<HistoryPoint[]>([]),[loadedHistoryLoading,setHistoryLoading]=useState(false),[loadedHistoryError,setHistoryError]=useState("");
+ const [loadedHistoryKey,setHistoryKey]=useState("");
  const [now,setNow]=useState(0),[lastRequest,setLastRequest]=useState(0);
  const refreshing=useRef(false);
  const refresh=useCallback(async()=>{
@@ -54,11 +56,17 @@ export default function Home(){
  const contracts=snapshot?.contracts??seed.map(c=>({...c,...stockMetadata(c.asset,c.market)}));
  const filtered=useMemo(()=>contracts.filter(c=>inMarketScope(c,market)&&(venue==="all"||c.venue===venue)&&matchesStockQuery(c,query)).sort((a,b)=>{if(sort==="name")return (a.stockCode??a.asset).localeCompare(b.stockCode??b.asset);const av=sort==="volume"?a.volume24h:normalized(a),bv=sort==="volume"?b.volume24h:normalized(b);if(av===null)return 1;if(bv===null)return -1;return sort==="rate-asc"?av-bv:bv-av;}),[contracts,market,venue,query,sort]);
  const active=filtered.find(c=>c.id===selected)??filtered[0];
- const [historyMeta,setHistoryMeta]=useState({excludedSpecialCount:0,intervalMethod:""});
+ const historyKey=JSON.stringify([active?.id,range,lastRequest]);
+ const historyMatches=mode==="term"&&loadedHistoryKey===historyKey;
+ const history=historyMatches?loadedHistory:[];
+ const historyLoading=!!active&&(!historyMatches||loadedHistoryLoading);
+ const historyError=historyMatches?loadedHistoryError:"";
+ const [loadedHistoryMeta,setHistoryMeta]=useState({excludedSpecialCount:0,intervalMethod:""});
+ const historyMeta=historyMatches?loadedHistoryMeta:{excludedSpecialCount:0,intervalMethod:""};
  useEffect(()=>{
   if(mode!=="term")return;
   if(!active){setHistory([]);return;}let cancelled=false;const abort=new AbortController();
-  setHistoryLoading(true);setHistoryError("");setHistory([]);setHistoryMeta({excludedSpecialCount:0,intervalMethod:""});
+  setHistoryKey(historyKey);setHistoryLoading(true);setHistoryError("");setHistory([]);setHistoryMeta({excludedSpecialCount:0,intervalMethod:""});
   (async()=>{
    type Result={points:HistoryPoint[];error?:string;excludedSpecialCount:number;intervalMethod:string};
    let result:Result;
@@ -69,7 +77,7 @@ export default function Home(){
    if(!cancelled){setHistory(result.points);setHistoryMeta({excludedSpecialCount:result.excludedSpecialCount,intervalMethod:result.intervalMethod});}
   })().catch(()=>{if(!cancelled)setHistoryError("暂时无法读取该合约历史，请稍后重试");}).finally(()=>{if(!cancelled)setHistoryLoading(false);});
   return()=>{cancelled=true;abort.abort();};
- },[mode,active?.id,range,lastRequest]);
+ },[mode,active?.id,range,lastRequest,historyKey]);
  const stateRef=useRef({snapshot,market,venue,query,sort,mode});stateRef.current={snapshot,market,venue,query,sort,mode};
  useEffect(()=>{
   type Tool={name:string;title:string;description:string;inputSchema:object;annotations:{readOnlyHint:boolean;untrustedContentHint:boolean};execute:(input:unknown)=>unknown};
@@ -86,8 +94,8 @@ export default function Home(){
  const countdown=lastRequest?Math.max(0,Math.ceil((REFRESH_INTERVAL_MS-((now||lastRequest)-lastRequest))/60000)):60;
  const cumulativePoints=useMemo(()=>fundingSeries(history),[history]);
  const cumulativeRate=cumulativePoints.length?cumulativePoints[cumulativePoints.length-1].cumulativeRatePercent/100:null;
- const completePoints=history.filter(p=>p.intervalHours!==null);
- const historyAvg=completePoints.length?completePoints.reduce((s,p)=>s+p.rate,0)/completePoints.reduce((s,p)=>s+p.intervalHours!,0):null;
+ const historicalSummary=useMemo(()=>historicalFundingSummary(history),[history]);
+ const historyAvg=historicalSummary.averageHourlyRate;
  return <main className="dashboard">
   <header className="topbar"><a className="brand" href="/" aria-label="RWA Funding 首页"><span className="brand-icon"><Activity size={23}/></span><span>RWA<span className="brand-light">FUNDING</span></span></a><span className="header-divider"/><span className="workspace-label">股票资金费率监控</span><div className="top-right"><span className="live-label"><Radio size={14}/> {loading?"同步中":snapshot?.feeds.every(f=>f.status==="error")?"连接异常":"每小时监控"}</span><span className="timezone">UTC+8</span></div></header>
   <div className="content"><div className="title-row"><div><div className="eyebrow">MARKET MONITOR <span>/ 01</span></div><h1>股票资金费率</h1><p className="intro">Hyperliquid · Binance · Aster</p></div><button className="refresh-button" onClick={refresh} disabled={loading}><RefreshCw size={15} className={loading?"spinning":""}/>{loading?"正在同步":"刷新数据"}</button></div>
@@ -104,6 +112,7 @@ export default function Home(){
    <div className="table-footer"><span>{snapshot?`${filtered.length} 个合约 · ${unique} 个标的` : "仅显示已核实标的，费率等待实时数据"}</span><span>正费率：多头支付 · 负费率：空头支付</span></div>
   </section>
   <section className="history-panel"><div className="chart-header"><div><div className="eyebrow">FUNDING HISTORY</div><h2>{active?`${active.asset} 资金费率历史`:"资金费率历史"}</h2><span className="subtle">{active?`${active.name} · ${active.venue} · ${active.symbol}`:"选择一个合约查看"} <span className="chart-unit">费率 + 累计</span></span>{active&&<div className="history-listing"><span>实际标的：{active.stockCode??"代码待核实"} · {marketLabels[active.market]}{active.aShareCode?" H 股":""}</span>{active.aShareCode&&<span>A 股关联：{active.aShareCode}</span>}</div>}</div><Tabs value={range} onValueChange={setRange}><TabsList>{[["1","24h"],["7","7 天"],["30","30 天"]].map(([v,l])=><TabsTrigger value={v} key={v}>{l}</TabsTrigger>)}</TabsList></Tabs></div>
+   <HistoricalAnnualizedReturn rate={historyLoading||historyError||!active?null:historicalSummary.annualizedRate} days={Number(range)} sampleHours={historyLoading||historyError||!active?0:historicalSummary.sampleHours} crossExchange={false} unknownPeriodCount={historyLoading||historyError||!active?0:historicalSummary.unknownPeriodCount}/>
    <div className="chart-layout"><div className="chart-area">{historyLoading?<div className="chart-empty"><RefreshCw size={20} className="spinning"/><span>读取资金费率历史…</span></div>:historyError?<div className="chart-empty"><Activity size={23}/><span>{historyError}</span></div>:history.length?<FundingHistoryChart points={history}/>:<div className="chart-empty"><Activity size={23}/><span>{active?"该合约暂无历史资金费率":"选择一个合约查看历史"}</span></div>}</div><div className="chart-summary"><span>当前预计费率</span><strong className={tone(active?.rate??null)}>{pct(active?.rate??null)}</strong><p>{active?.intervalHours?`每 ${active.intervalHours} 小时结算` : "结算周期待确认"}{active?.nextFundingTime?` · 下次 ${time(active.nextFundingTime)}`:""}</p><div className="summary-divider"/><span>所选区间平均 / 1h</span><strong className={tone(historyAvg)}>{pct(historyAvg)}</strong><p>{history.length} 条结算记录</p><div className="summary-divider"/><span>所选区间累计费率</span><strong className={tone(cumulativeRate)}>{pct(cumulativeRate)}</strong><p>正值多头支付 · 负值空头支付{historyMeta.excludedSpecialCount>0?` · 已排除 ${historyMeta.excludedSpecialCount} 条分红调整`:""}</p>{active&&<a href={active.tradeUrl} target="_blank" rel="noreferrer" className="trade-link">在 {active.venue} 查看 <ExternalLink size={13}/></a>}</div></div>
   </section>
   </>}

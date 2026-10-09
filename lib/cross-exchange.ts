@@ -1,5 +1,6 @@
 import type {Contract,HistoryPoint} from "./exchanges/types";
 import {inMarketScope,matchesStockQuery} from "./exchanges/stock-metadata";
+import {annualizedFundingRate} from "./funding-history";
 
 export interface FundingPair {
  id:string;stockKey:string;stockCode:string;a:Contract;b:Contract;
@@ -62,6 +63,7 @@ export interface PairHistoryPoint {
 export interface PairHistory {
  points:PairHistoryPoint[];comparedHours:number;settledHours:number;segments:number;
  averageHourlySpread:number|null;cumulativeSpread:number|null;periodStart:number|null;periodEnd:number|null;
+ annualizedGrossReturn:number|null;
 }
 
 /** Uniformly allocate settled rates to covered hours, then compare only complete shared hours. */
@@ -117,5 +119,6 @@ export function compareFundingHistory(shortPoints:HistoryPoint[],longPoints:Hist
   settledHours+=(finish-begin)/HOUR;previousEnd=finish;periodEnd=finish;
  }
  const differences=points.flatMap(p=>p.hourlyRatePercent===null?[]:[p.hourlyRatePercent/100]);
- return {points,comparedHours:differences.length,settledHours,segments,averageHourlySpread:differences.length?differences.reduce((sum,r)=>sum+r,0)/differences.length:null,cumulativeSpread:segments===1?cumulative:null,periodStart,periodEnd};
+ const averageHourlySpread=differences.length?differences.reduce((sum,r)=>sum+r,0)/differences.length:null;
+ return {points,comparedHours:differences.length,settledHours,segments,averageHourlySpread,annualizedGrossReturn:annualizedFundingRate(averageHourlySpread),cumulativeSpread:segments===1?cumulative:null,periodStart,periodEnd};
 }

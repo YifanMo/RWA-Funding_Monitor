@@ -5,6 +5,23 @@ export interface FundingChartPoint extends HistoryPoint {
  cumulativeRatePercent:number;
 }
 
+/** Simple historical annualization on one leg's notional, with no compounding or leverage. */
+export function annualizedFundingRate(hourlyRate:number|null):number|null{
+ if(hourlyRate===null||!Number.isFinite(hourlyRate))return null;
+ const annualized=hourlyRate*24*365;
+ return Number.isFinite(annualized)?annualized:null;
+}
+
+/** Historical payments are time-weighted by their known settlement periods. */
+export function historicalFundingSummary(points:HistoryPoint[]){
+ const rows=fundingSeries(points);
+ const usable=rows.filter(p=>p.intervalHours!==null&&Number.isFinite(p.intervalHours)&&p.intervalHours>0);
+ const sampleHours=usable.reduce((sum,p)=>sum+p.intervalHours!,0);
+ const sampleRate=usable.reduce((sum,p)=>sum+p.rate,0);
+ const averageHourlyRate=sampleHours>0?sampleRate/sampleHours:null;
+ return {averageHourlyRate,annualizedRate:annualizedFundingRate(averageHourlyRate),sampleHours,unknownPeriodCount:rows.length-usable.length};
+}
+
 /** Sum actual settled rates, including negative payments. Period normalization is ONLY for the rate curve. */
 export function fundingSeries(points:HistoryPoint[]):FundingChartPoint[]{
  const ordered=[...new Map(points.filter(p=>Number.isFinite(p.time)&&Number.isFinite(p.rate)).map(p=>[p.time,p])).values()].sort((a,b)=>a.time-b.time);
