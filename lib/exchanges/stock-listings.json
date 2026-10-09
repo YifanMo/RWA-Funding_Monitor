@@ -1,0 +1,1190 @@
+[
+  {
+    "asset": "CXMT",
+    "market": "CN",
+    "code": "688825.SH",
+    "name": "长鑫科技",
+    "source": "https://www.sse.com.cn/disclosure/announcement/listing/ipo/c/c_20260724_10826610.shtml",
+    "sources": [
+      "https://www.sse.com.cn/disclosure/announcement/listing/ipo/c/c_20260724_10826610.shtml",
+      "https://api.hyperliquid.xyz/info"
+    ],
+    "note": "2026-07-27起在上交所科创板上市；Hyperliquid xyz:CXMT perpAnnotation实际标的为该A股。",
+    "shareClass": "A Shares"
+  },
+  {
+    "asset": "GIGADEV",
+    "market": "CN",
+    "code": "603986.SH",
+    "name": "兆易创新",
+    "source": "https://www.gigadevice.com/about/news-and-event/news/gigadevice-listed-on-hkex",
+    "sources": [
+      "https://www.gigadevice.com/about/news-and-event/news/gigadevice-listed-on-hkex",
+      "https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0112/2026011201539.pdf",
+      "https://api.hyperliquid.xyz/info"
+    ],
+    "note": "Hyperliquid xyz:GIGADEV perpAnnotation明确跟踪A股603986；同公司H股03986.HK。",
+    "shareClass": "A Shares"
+  },
+  {
+    "asset": "UNITREE",
+    "market": "CN",
+    "code": "688836.SH",
+    "name": "宇树科技",
+    "source": "https://www.sse.com.cn/disclosure/announcement/listing/ipo/c/c_20260818_10829204.shtml",
+    "sources": [
+      "https://www.sse.com.cn/disclosure/announcement/listing/ipo/c/c_20260818_10829204.shtml",
+      "https://static.cninfo.com.cn/finalpage/2026-08-14/1225472623.PDF",
+      "https://www.binance.com/en/square/post/357234540128753",
+      "https://api.hyperliquid.xyz/info"
+    ],
+    "note": "2026-08-19起在上交所科创板上市；Hyperliquid xyz:UNITREE perpAnnotation实际标的为该A股。",
+    "shareClass": "A Shares"
+  },
+  {
+    "asset": "BYD",
+    "market": "HK",
+    "code": "01211.HK",
+    "name": "比亚迪",
+    "source": "https://www.bydglobal.com/cn/investor-relations?scroll=true",
+    "sources": [
+      "https://www.bydglobal.com/cn/investor-relations?scroll=true",
+      "https://www.binance.com/en/support/announcement/detail/89a035c3ee0e4b7782bf0089323d8e78"
+    ],
+    "relatedA": "002594.SZ",
+    "relatedAStatus": "confirmed",
+    "note": "合约实际标的是港股H股01211.HK；公司关联A股002594.SZ。",
+    "shareClass": "H Shares"
+  },
+  {
+    "asset": "GIGADEV",
+    "market": "HK",
+    "code": "03986.HK",
+    "name": "兆易创新",
+    "source": "https://www.binance.com/en/support/announcement/detail/e8bfd0c5adaf4d8a880bb1b7327107ef",
+    "sources": [
+      "https://www.binance.com/en/support/announcement/detail/e8bfd0c5adaf4d8a880bb1b7327107ef",
+      "https://www.gigadevice.com/about/news-and-event/news/gigadevice-listed-on-hkex",
+      "https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0112/2026011201539.pdf"
+    ],
+    "relatedA": "603986.SH",
+    "relatedAStatus": "confirmed",
+    "note": "Binance GIGADEVUSDT实际标的为H股03986.HK；公司关联A股603986.SH。",
+    "shareClass": "H Shares"
+  },
+  {
+    "asset": "HK0625",
+    "market": "HK",
+    "code": "00625.HK",
+    "name": "希音",
+    "source": "https://www.binance.com/en/support/announcement/detail/969a4628dd5d4a479c071b02175bae57",
+    "sources": [
+      "https://www.binance.com/en/support/announcement/detail/969a4628dd5d4a479c071b02175bae57",
+      "https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0824/2026082400019.pdf",
+      "https://www.hkex.com.hk/News/News-Release/2026/260828news?sc_lang=en"
+    ],
+    "relatedAStatus": "not_listed",
+    "note": "Official prospectus Appendix IV, printed IV-47 / PDF page 478, explicitly states no other stock exchange has company equity/debt listed, dealt in, or a listing being/proposed to be sought. Cayman-incorporated Class B shares; HK listing is not H-share category. Its Class A Shares are WVR classes, not mainland A shares. No newer official A listing evidence found in research to 2026-10-09.",
+    "shareClass": "Class B ordinary shares"
+  },
+  {
+    "asset": "HK0700",
+    "market": "HK",
+    "code": "00700.HK",
+    "name": "腾讯控股",
+    "source": "https://www.binance.com/en/support/announcement/detail/18724cba64a048938986a98bbb257258",
+    "sources": [
+      "https://www.binance.com/en/support/announcement/detail/18724cba64a048938986a98bbb257258",
+      "https://www.tencent.com/zh-cn/investors/",
+      "https://www.tencent.com/index.php/zh-cn/investors.html"
+    ],
+    "relatedAStatus": "not_listed",
+    "note": "同一腾讯控股港股代码；TCNT为Hyperliquid io合约显示名TENCENT的别名。当前公司上市证券披露为香港股票，未有大陆A股代码。",
+    "shareClass": "Hong Kong ordinary shares"
+  },
+  {
+    "asset": "HK0992",
+    "market": "HK",
+    "code": "00992.HK",
+    "name": "联想集团",
+    "source": "https://investor.lenovo.com/en/ir/faq.php",
+    "sources": [
+      "https://investor.lenovo.com/en/ir/faq.php",
+      "https://investor.lenovo.com/en/global/home.php",
+      "https://www.binance.com/en/support/announcement/detail/89a035c3ee0e4b7782bf0089323d8e78"
+    ],
+    "relatedAStatus": "not_listed",
+    "note": "公司FAQ完整列出香港00992、人民币柜台80992及美国OTC ADR LNVGY；没有大陆A股代码。联想集团不是港股03396联想控股。",
+    "shareClass": "Hong Kong ordinary shares"
+  },
+  {
+    "asset": "HK1810",
+    "market": "HK",
+    "code": "01810.HK",
+    "name": "小米集团",
+    "source": "https://www.binance.com/en/support/announcement/detail/18724cba64a048938986a98bbb257258",
+    "sources": [
+      "https://www.binance.com/en/support/announcement/detail/18724cba64a048938986a98bbb257258",
+      "https://ir.mi.com/zh-hans"
+    ],
+    "relatedAStatus": "not_listed",
+    "note": "香港股票；人民币柜台81810仍是香港股票，并非大陆A股。公司已核实上市证券披露仅见香港上市，未有大陆A股代码。",
+    "shareClass": "Class B ordinary shares"
+  },
+  {
+    "asset": "KUAISHOU",
+    "market": "HK",
+    "code": "01024.HK",
+    "name": "快手",
+    "source": "https://ir.kuaishou.com/investor-resources/investor-faqs",
+    "sources": [
+      "https://ir.kuaishou.com/investor-resources/investor-faqs",
+      "https://www.binance.com/en/support/announcement/detail/45c2f20d589b420e80063ab75feb41f2"
+    ],
+    "relatedAStatus": "not_listed",
+    "note": "公司FAQ列出港币柜台01024、人民币柜台81024；两者均为香港Class B普通股，人民币柜台不是大陆A股。",
+    "shareClass": "Class B ordinary shares"
+  },
+  {
+    "asset": "MEITUAN",
+    "market": "HK",
+    "code": "03690.HK",
+    "name": "美团",
+    "source": "https://www.meituan.com/investor-relations",
+    "sources": [
+      "https://www.meituan.com/investor-relations",
+      "https://www.meituan.com/zh-HK/news/NN260828216013035",
+      "https://www1.hkexnews.hk/listedco/listconews/sehk/2025/0516/2025051600020_c.pdf",
+      "https://www.binance.com/en/support/announcement/detail/45c2f20d589b420e80063ab75feb41f2"
+    ],
+    "relatedAStatus": "not_listed",
+    "note": "香港Class B普通股，人民币柜台83690也属香港股票，不是大陆A股；无大陆A股关联代码。",
+    "shareClass": "Class B ordinary shares"
+  },
+  {
+    "asset": "MINIMAX",
+    "market": "HK",
+    "code": "00100.HK",
+    "name": "MiniMax（稀宇科技）",
+    "source": "https://www.binance.com/en/support/announcement/detail/18724cba64a048938986a98bbb257258",
+    "sources": [
+      "https://www.binance.com/en/support/announcement/detail/18724cba64a048938986a98bbb257258",
+      "https://www1.hkexnews.hk/search/titlesearch.xhtml?category=0&lang=EN&market=SEHK&stockId=1000286746",
+      "https://ir.minimax.cn/en"
+    ],
+    "relatedAStatus": "not_listed",
+    "note": "港股普通股；Class A ordinary share 是公司股份类别，不是中国大陆A股。公司已核实上市证券披露仅见香港代码00100；没有大陆A股关联代码。",
+    "shareClass": "Hong Kong ordinary shares"
+  },
+  {
+    "asset": "POPMART",
+    "market": "HK",
+    "code": "09992.HK",
+    "name": "泡泡玛特",
+    "source": "https://www1.hkexnews.hk/search/titlesearch.xhtml?category=0&market=SEHK&stockId=1000068054",
+    "sources": [
+      "https://www1.hkexnews.hk/search/titlesearch.xhtml?category=0&market=SEHK&stockId=1000068054",
+      "https://www.popmart.com.cn/home/investor",
+      "https://www.hkexnews.hk/listedco/listconews/sehk/2024/0924/2024092400406_c.pdf"
+    ],
+    "relatedAStatus": "not_listed",
+    "note": "开曼公司香港普通股，已核实披露的上市证券为09992.HK；无大陆A股关联代码。",
+    "shareClass": "Hong Kong ordinary shares"
+  },
+  {
+    "asset": "SHEIN",
+    "market": "HK",
+    "code": "00625.HK",
+    "name": "希音",
+    "source": "https://www.binance.com/en/support/announcement/detail/969a4628dd5d4a479c071b02175bae57",
+    "sources": [
+      "https://www.binance.com/en/support/announcement/detail/969a4628dd5d4a479c071b02175bae57",
+      "https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0824/2026082400019.pdf",
+      "https://www.hkex.com.hk/News/News-Release/2026/260828news?sc_lang=en"
+    ],
+    "relatedAStatus": "not_listed",
+    "note": "Official prospectus Appendix IV, printed IV-47 / PDF page 478, explicitly states no other stock exchange has company equity/debt listed, dealt in, or a listing being/proposed to be sought. Cayman-incorporated Class B shares; HK listing is not H-share category. Its Class A Shares are WVR classes, not mainland A shares. No newer official A listing evidence found in research to 2026-10-09.",
+    "shareClass": "Class B ordinary shares"
+  },
+  {
+    "asset": "TCNT",
+    "market": "HK",
+    "code": "00700.HK",
+    "name": "腾讯控股",
+    "source": "https://www.binance.com/en/support/announcement/detail/18724cba64a048938986a98bbb257258",
+    "sources": [
+      "https://www.binance.com/en/support/announcement/detail/18724cba64a048938986a98bbb257258",
+      "https://www.tencent.com/zh-cn/investors/",
+      "https://www.tencent.com/index.php/zh-cn/investors.html"
+    ],
+    "relatedAStatus": "not_listed",
+    "note": "同一腾讯控股港股代码；TCNT为Hyperliquid io合约显示名TENCENT的别名。当前公司上市证券披露为香港股票，未有大陆A股代码。",
+    "shareClass": "Hong Kong ordinary shares"
+  },
+  {
+    "asset": "TENCENT",
+    "market": "HK",
+    "code": "00700.HK",
+    "name": "腾讯控股",
+    "source": "https://www.binance.com/en/support/announcement/detail/18724cba64a048938986a98bbb257258",
+    "sources": [
+      "https://www.binance.com/en/support/announcement/detail/18724cba64a048938986a98bbb257258",
+      "https://www.tencent.com/zh-cn/investors/",
+      "https://www.tencent.com/index.php/zh-cn/investors.html"
+    ],
+    "relatedAStatus": "not_listed",
+    "note": "同一腾讯控股港股代码；TCNT为Hyperliquid io合约显示名TENCENT的别名。当前公司上市证券披露为香港股票，未有大陆A股代码。",
+    "shareClass": "Hong Kong ordinary shares"
+  },
+  {
+    "asset": "XIAOMI",
+    "market": "HK",
+    "code": "01810.HK",
+    "name": "小米集团",
+    "source": "https://www.binance.com/en/support/announcement/detail/18724cba64a048938986a98bbb257258",
+    "sources": [
+      "https://www.binance.com/en/support/announcement/detail/18724cba64a048938986a98bbb257258",
+      "https://ir.mi.com/zh-hans"
+    ],
+    "relatedAStatus": "not_listed",
+    "note": "香港股票；人民币柜台81810仍是香港股票，并非大陆A股。公司已核实上市证券披露仅见香港上市，未有大陆A股代码。",
+    "shareClass": "Class B ordinary shares"
+  },
+  {
+    "asset": "ZHIPU",
+    "market": "HK",
+    "code": "02513.HK",
+    "name": "智谱",
+    "source": "https://www.binance.com/en/support/announcement/detail/18724cba64a048938986a98bbb257258",
+    "sources": [
+      "https://www.binance.com/en/support/announcement/detail/18724cba64a048938986a98bbb257258",
+      "https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0601/2026060104247_c.pdf",
+      "https://www.hkexnews.hk/listedco/listconews/sehk/2026/0602/2026060200011.pdf"
+    ],
+    "relatedAStatus": "not_verified",
+    "note": "已确认港股H股代码02513；2026-06-01官方通函包含拟发行A股并在科创板上市。至2026-10-09未核实已完成A股上市或取得大陆A股代码，不应纳入已确认A/H关联。",
+    "shareClass": "H Shares"
+  },
+  {
+    "asset": "ZHONGJI",
+    "market": "HK",
+    "code": "03308.HK",
+    "name": "中际旭创",
+    "source": "https://www.binance.com/en-AE/support/announcement/detail/343eff2647754fb1bd0664bba24e9a36",
+    "sources": [
+      "https://www.binance.com/en-AE/support/announcement/detail/343eff2647754fb1bd0664bba24e9a36",
+      "https://www.zj-innolight.com/en/index.html",
+      "https://static.cninfo.com.cn/finalpage/2026-08-27/1225515675.PDF"
+    ],
+    "relatedA": "300308.SZ",
+    "relatedAStatus": "confirmed",
+    "note": "合约实际标的是H股03308.HK；同公司A股300308.SZ已核实。",
+    "shareClass": "H Shares"
+  },
+  {
+    "asset": "AAOI",
+    "market": "US",
+    "code": "AAOI",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "AAPL",
+    "market": "US",
+    "code": "AAPL",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "ACN",
+    "market": "US",
+    "code": "ACN",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "ADBE",
+    "market": "US",
+    "code": "ADBE",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "AGPU",
+    "market": "US",
+    "code": "AGPU",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "AKAM",
+    "market": "US",
+    "code": "AKAM",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "ALAB",
+    "market": "US",
+    "code": "ALAB",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "AMAT",
+    "market": "US",
+    "code": "AMAT",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "AMC",
+    "market": "US",
+    "code": "AMC",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "AMD",
+    "market": "US",
+    "code": "AMD",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "AMZN",
+    "market": "US",
+    "code": "AMZN",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "ANET",
+    "market": "US",
+    "code": "ANET",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "APLD",
+    "market": "US",
+    "code": "APLD",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "APP",
+    "market": "US",
+    "code": "APP",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "ARM",
+    "market": "US",
+    "code": "ARM",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "ASML",
+    "market": "US",
+    "code": "ASML",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "ASTS",
+    "market": "US",
+    "code": "ASTS",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "AVGO",
+    "market": "US",
+    "code": "AVGO",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "AXTI",
+    "market": "US",
+    "code": "AXTI",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "BABA",
+    "market": "US",
+    "code": "BABA",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "BB",
+    "market": "US",
+    "code": "BB",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "BBX",
+    "market": "US",
+    "code": "BB",
+    "source": "https://investors.blackberry.com/faq"
+  },
+  {
+    "asset": "BE",
+    "market": "US",
+    "code": "BE",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "BIRD",
+    "market": "US",
+    "code": "BIRD",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "BMNR",
+    "market": "US",
+    "code": "BMNR",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "BNC",
+    "market": "US",
+    "code": "BNC",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "BOT",
+    "market": "US",
+    "code": "BOT",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "BRKB",
+    "market": "US",
+    "code": "BRK.B",
+    "source": "https://www.binance.com/en/support/announcement/detail/a2bce2686fc64a61b44c4335facafe7f"
+  },
+  {
+    "asset": "BSP",
+    "market": "US",
+    "code": "BSP",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "BX",
+    "market": "US",
+    "code": "BX",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "CAT",
+    "market": "US",
+    "code": "CAT",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "CBRS",
+    "market": "US",
+    "code": "CBRS",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "CIEN",
+    "market": "US",
+    "code": "CIEN",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "COHR",
+    "market": "US",
+    "code": "COHR",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "COIN",
+    "market": "US",
+    "code": "COIN",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "COST",
+    "market": "US",
+    "code": "COST",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "CRCL",
+    "market": "US",
+    "code": "CRCL",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "CRDO",
+    "market": "US",
+    "code": "CRDO",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "CRM",
+    "market": "US",
+    "code": "CRM",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "CRML",
+    "market": "US",
+    "code": "CRML",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "CRWD",
+    "market": "US",
+    "code": "CRWD",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "CRWV",
+    "market": "US",
+    "code": "CRWV",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "CSCO",
+    "market": "US",
+    "code": "CSCO",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "CVNA",
+    "market": "US",
+    "code": "CVNA",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "CVX",
+    "market": "US",
+    "code": "CVX",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "CYPH",
+    "market": "US",
+    "code": "CYPH",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "DDOG",
+    "market": "US",
+    "code": "DDOG",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "DELL",
+    "market": "US",
+    "code": "DELL",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "DIS",
+    "market": "US",
+    "code": "DIS",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "DJT",
+    "market": "US",
+    "code": "DJT",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "DKNG",
+    "market": "US",
+    "code": "DKNG",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "EBAY",
+    "market": "US",
+    "code": "EBAY",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "FLEX",
+    "market": "US",
+    "code": "FLEX",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "FLNC",
+    "market": "US",
+    "code": "FLNC",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "FUTU",
+    "market": "US",
+    "code": "FUTU",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "FWDI",
+    "market": "US",
+    "code": "FWDI",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "GEV",
+    "market": "US",
+    "code": "GEV",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "GLW",
+    "market": "US",
+    "code": "GLW",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "GME",
+    "market": "US",
+    "code": "GME",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "GOOGL",
+    "market": "US",
+    "code": "GOOGL",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "GPRO",
+    "market": "US",
+    "code": "GPRO",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "GS",
+    "market": "US",
+    "code": "GS",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "GTLB",
+    "market": "US",
+    "code": "GTLB",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "HD",
+    "market": "US",
+    "code": "HD",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "HIMS",
+    "market": "US",
+    "code": "HIMS",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "HOOD",
+    "market": "US",
+    "code": "HOOD",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "HPE",
+    "market": "US",
+    "code": "HPE",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "HUT",
+    "market": "US",
+    "code": "HUT",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "IBM",
+    "market": "US",
+    "code": "IBM",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "INTC",
+    "market": "US",
+    "code": "INTC",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "IONQ",
+    "market": "US",
+    "code": "IONQ",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "IREN",
+    "market": "US",
+    "code": "IREN",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "JPM",
+    "market": "US",
+    "code": "JPM",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "KLAC",
+    "market": "US",
+    "code": "KLAC",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "KO",
+    "market": "US",
+    "code": "KO",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "LITE",
+    "market": "US",
+    "code": "LITE",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "LLY",
+    "market": "US",
+    "code": "LLY",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "LRCX",
+    "market": "US",
+    "code": "LRCX",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "MARA",
+    "market": "US",
+    "code": "MARA",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "MCD",
+    "market": "US",
+    "code": "MCD",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "MDB",
+    "market": "US",
+    "code": "MDB",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "META",
+    "market": "US",
+    "code": "META",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "MP",
+    "market": "US",
+    "code": "MP",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "MRK",
+    "market": "US",
+    "code": "MRK",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "MRNA",
+    "market": "US",
+    "code": "MRNA",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "MRVL",
+    "market": "US",
+    "code": "MRVL",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "MSFT",
+    "market": "US",
+    "code": "MSFT",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "MSTR",
+    "market": "US",
+    "code": "MSTR",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "MU",
+    "market": "US",
+    "code": "MU",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "NBIS",
+    "market": "US",
+    "code": "NBIS",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "NET",
+    "market": "US",
+    "code": "NET",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "NFLX",
+    "market": "US",
+    "code": "NFLX",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "NKE",
+    "market": "US",
+    "code": "NKE",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "NOK",
+    "market": "US",
+    "code": "NOK",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "NOW",
+    "market": "US",
+    "code": "NOW",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "NVDA",
+    "market": "US",
+    "code": "NVDA",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "NVO",
+    "market": "US",
+    "code": "NVO",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "OKLO",
+    "market": "US",
+    "code": "OKLO",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "ONDS",
+    "market": "US",
+    "code": "ONDS",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "ORCL",
+    "market": "US",
+    "code": "ORCL",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "PANW",
+    "market": "US",
+    "code": "PANW",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "PATH",
+    "market": "US",
+    "code": "PATH",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "PAYP",
+    "market": "US",
+    "code": "PAYP",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "PDD",
+    "market": "US",
+    "code": "PDD",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "PENG",
+    "market": "US",
+    "code": "PENG",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "PLTR",
+    "market": "US",
+    "code": "PLTR",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "PURRDAT",
+    "market": "US",
+    "code": "PURR",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "PYPL",
+    "market": "US",
+    "code": "PYPL",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "QCOM",
+    "market": "US",
+    "code": "QCOM",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "QNT",
+    "market": "US",
+    "code": "QNT",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "QNTX",
+    "market": "US",
+    "code": "QNT",
+    "source": "https://www.binance.com/en/support/announcement/detail/3bdaff694bde45ccb443709336c8686d"
+  },
+  {
+    "asset": "RDDT",
+    "market": "US",
+    "code": "RDDT",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "RIVN",
+    "market": "US",
+    "code": "RIVN",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "RKLB",
+    "market": "US",
+    "code": "RKLB",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "RUM",
+    "market": "US",
+    "code": "RUM",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "SDEV",
+    "market": "US",
+    "code": "SDEV",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "SECZ",
+    "market": "US",
+    "code": "SECZ",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "SHAZ",
+    "market": "US",
+    "code": "SHAZ",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "SHOP",
+    "market": "US",
+    "code": "SHOP",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "SKHY",
+    "market": "US",
+    "code": "SKHY",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "SMCI",
+    "market": "US",
+    "code": "SMCI",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "SNDK",
+    "market": "US",
+    "code": "SNDK",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "SNOW",
+    "market": "US",
+    "code": "SNOW",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "SOFI",
+    "market": "US",
+    "code": "SOFI",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "SONY",
+    "market": "US",
+    "code": "SONY",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "SPCX",
+    "market": "US",
+    "code": "SPCX",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "STRC",
+    "market": "US",
+    "code": "STRC",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "STXX",
+    "market": "US",
+    "code": "STX",
+    "source": "https://www.binance.com/zh-CN/support/announcement/detail/f622c1f2a1a94ba1894d9a9e265fb4b9"
+  },
+  {
+    "asset": "TEAM",
+    "market": "US",
+    "code": "TEAM",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "TEM",
+    "market": "US",
+    "code": "TEM",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "TER",
+    "market": "US",
+    "code": "TER",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "TSLA",
+    "market": "US",
+    "code": "TSLA",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "TSM",
+    "market": "US",
+    "code": "TSM",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "TTWO",
+    "market": "US",
+    "code": "TTWO",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "TWST",
+    "market": "US",
+    "code": "TWST",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "TXN",
+    "market": "US",
+    "code": "TXN",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "UBER",
+    "market": "US",
+    "code": "UBER",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "UMC",
+    "market": "US",
+    "code": "UMC",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "UNH",
+    "market": "US",
+    "code": "UNH",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "USAR",
+    "market": "US",
+    "code": "USAR",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "USDEX",
+    "market": "US",
+    "code": "USDE",
+    "source": "https://www.binance.com/en-TR/support/announcement/detail/ea19450f515843098a5d5e55fc6e3589"
+  },
+  {
+    "asset": "V",
+    "market": "US",
+    "code": "V",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "VKTX",
+    "market": "US",
+    "code": "VKTX",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "VRT",
+    "market": "US",
+    "code": "VRT",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "VST",
+    "market": "US",
+    "code": "VST",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "WDC",
+    "market": "US",
+    "code": "WDC",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "WEN",
+    "market": "US",
+    "code": "WEN",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "WMT",
+    "market": "US",
+    "code": "WMT",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "XOM",
+    "market": "US",
+    "code": "XOM",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  },
+  {
+    "asset": "ZM",
+    "market": "US",
+    "code": "ZM",
+    "source": "https://api.hyperliquid.xyz/info"
+  },
+  {
+    "asset": "ZS",
+    "market": "US",
+    "code": "ZS",
+    "source": "https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqtraded.txt"
+  }
+]

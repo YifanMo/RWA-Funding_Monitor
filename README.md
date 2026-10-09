@@ -25,6 +25,14 @@ npm run dev
 
 `.openai/hosting.json` 保留现有 Sites 项目绑定，供构建使用，不包含 API 密钥。`build/` 和 `scripts/` 是构建与本地运行所需源码；依赖、构建产物、本地运行状态和 `.env*` 文件均不提交。
 
+## 股票代码与 A 股关联
+
+表格与历史详情分别显示永续合约代码和实际跟踪的股票代码。例如 Binance `BYDUSDT` 跟踪 `01211.HK`，并标明关联 A 股 `002594.SZ`。股票代码保留前导零、美股股份类别，以及 `.SH` / `.SZ` / `.HK` 后缀；搜索支持实际代码和关联 A 股代码。
+
+A 股页同时展示实际 A 股合约，以及已核实在 A/H 股同时上市公司的港股合约。关联只影响筛选范围，不改变 `Contract.market`；全部市场中同一份合约只有一行，费率和成交额不会因跨页展示重复统计。当前已确认的关联包括比亚迪、兆易创新和中际旭创。此筛选不以 A/H 溢价为条件，也不将两类股票合并为同一个套利标的。
+
+`lib/exchanges/stock-listings.json` 保存按 `(market, asset)` 核实的代码、名称、来源及可选 `relatedA`。美股采用官方上市目录或合约公告；Hyperliquid 可从明确的上市引用中提取代码，新标的无法核实代码时显示“待核实”。港股 Class A 普通股、拟 A 股上市均不自动视为已经 A/H 双重上市。新增股票可在此目录补充代码和关联。
+
 ## 新增交易所
 
 1. 在 `lib/exchanges/` 新建适配器，实现 `ExchangeAdapter` 的 `discover()` 和 `history(symbol, days)`。
@@ -45,6 +53,7 @@ npm run dev
 - Binance / Aster 读取 `fundingInfo` 的实际周期，历史周期按相邻普通结算时间推算；无法确认的记录保留原始值，但不参加归一化曲线或平均费率计算。
 - Binance `rateType=Special` 是分红调整，单独计数并排除普通资金费率曲线。
 - 按实际上市市场分类，Binance GIGADEV 是 H 股，Hyperliquid GIGADEV 是 A 股；同名不表示同一可对冲标的。
+- 市场页使用实际股票代码识别标的；同一股票的不同合约别名合并标的计数，但保留每份交易合约的独立行。
 - ETF、商品、外汇、加密货币、日韩股、未确认的预上市产品不在三类股票列表中。Binance 的 ETF 分类采用已核实的排除表，新上市资产应继续复核。
 - 标记价格以合约报价币显示；成交额以 USD / USDT / USD1 的近似美元等值展示。
 
@@ -56,10 +65,12 @@ node_modules/.bin/esbuild tests/exchanges.test.ts --bundle --platform=node --for
 node /tmp/rwa-exchange-tests.mjs
 node_modules/.bin/esbuild tests/funding-history.test.ts --bundle --platform=node --format=esm --outfile=/tmp/rwa-funding-history-tests.mjs
 node /tmp/rwa-funding-history-tests.mjs
+node_modules/.bin/esbuild tests/stock-metadata.test.ts --bundle --platform=node --format=esm --outfile=/tmp/rwa-stock-metadata-tests.mjs
+node /tmp/rwa-stock-metadata-tests.mjs
 npm run build
 ```
 
-测试覆盖资金周期换算、A/H 股分类、ETF 排除、分红调整排除、历史周期变化、30 天分页、累计费率、双轴零线对齐与小时缓存。WebMCP 提供读取监控和设置筛选两个工具，只操作监控页面。
+测试覆盖资金周期换算、A/H 股分类和关联筛选、代码前导零、合约别名、去重统计、ETF 排除、分红调整排除、历史周期变化、30 天分页、累计费率、双轴零线对齐与小时缓存。WebMCP 提供读取监控和设置筛选两个工具，只操作监控页面。
 
 ## 官方来源
 

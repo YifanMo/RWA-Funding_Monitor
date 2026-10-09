@@ -5,6 +5,7 @@ export interface Contract {
  rate:number|null; intervalHours:number|null; markPrice:number|null; volume24h:number|null;
  openInterestUsd:number|null; nextFundingTime:number|null; fetchedAt:number; quoteAsset:string;
  tradeUrl:string; underlying?:string; kind?:string;
+ stockCode?:string; aShareCode?:string; stockCodeSource?:string;
 }
 export interface Feed { venue:Venue; status:"ok"|"partial"|"error"|"stale"; count:number; fetchedAt:number|null; error?:string }
 export interface MarketResult { contracts:Contract[]; feed:Feed }

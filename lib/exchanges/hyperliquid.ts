@@ -1,6 +1,7 @@
 import excluded from "./hyperliquid-excluded.json";
 import catalog from "./hyperliquid-catalog.json";
 import names from "./stock-names.json";
+import {stockMetadata} from "./stock-metadata";
 import {publicJson,message} from "./http";
 import {finite,type Contract,type Market,type ExchangeAdapter,type HistoryPoint} from "./types";
 const INFO="https://api.hyperliquid.xyz/info";
@@ -39,7 +40,7 @@ export const hyperliquid:ExchangeAdapter={
     const asset=known?.displayName||annotation.displayName||m.name.split(":").pop()!;
     const description=known?.description||annotation.description;
     const markPrice=finite(ctx.markPx),oi=finite(ctx.openInterest);
-    contracts.push({id:`hyperliquid:${m.name}`,asset,symbol:m.name,name:(names as Record<string,string>)[asset]||asset,market,venue:"Hyperliquid",builder:dexes[i]||undefined,rate:finite(ctx.funding),intervalHours:1,markPrice,volume24h:finite(ctx.dayNtlVlm),openInterestUsd:oi!==null&&markPrice!==null?oi*markPrice:null,nextFundingTime:(Math.floor(updatedAt/3600000)+1)*3600000,fetchedAt:updatedAt,quoteAsset:"USD",tradeUrl:`https://app.hyperliquid.xyz/trade/${encodeURIComponent(m.name)}`,underlying:description});
+    contracts.push({id:`hyperliquid:${m.name}`,asset,symbol:m.name,name:(names as Record<string,string>)[asset]||asset,market,venue:"Hyperliquid",builder:dexes[i]||undefined,rate:finite(ctx.funding),intervalHours:1,markPrice,volume24h:finite(ctx.dayNtlVlm),openInterestUsd:oi!==null&&markPrice!==null?oi*markPrice:null,nextFundingTime:(Math.floor(updatedAt/3600000)+1)*3600000,fetchedAt:updatedAt,quoteAsset:"USD",tradeUrl:`https://app.hyperliquid.xyz/trade/${encodeURIComponent(m.name)}`,underlying:description,...stockMetadata(asset,market,description)});
    }
   }
   if(failed===dexes.length&&dexes.length)throw Error("Hyperliquid 所有股票市场读取失败");

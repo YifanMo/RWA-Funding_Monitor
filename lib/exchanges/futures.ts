@@ -1,4 +1,5 @@
 import names from "./stock-names.json";
+import {stockMetadata} from "./stock-metadata";
 import {publicJson} from "./http";
 import {finite,type Contract,type ExchangeAdapter,type Market,type HistoryPoint} from "./types";
 export type SymbolInfo={symbol:string;baseAsset:string;quoteAsset:string;status:string;contractType:string;underlyingType:string;underlyingSubType:string[];channel?:string;tags?:string[];name?:string};
@@ -20,7 +21,7 @@ export function futuresAdapter(config:FuturesConfig):ExchangeAdapter{
     const p=rates.get(s.symbol);const interval=finite(intervals.get(s.symbol));
     const rate=finite(p?.lastFundingRate);
     const tags=s.tags??[];const chinese=tags.find(t=>/[\u4e00-\u9fff]/.test(t)&&t.length>1&&!['股票','科技','金融','汽车','能源','指数','美股'].includes(t));
-    contracts.push({id:`${config.id}:${s.symbol}`,asset:s.baseAsset,symbol:s.symbol,name:(names as Record<string,string>)[s.baseAsset]||chinese||s.baseAsset,market,venue:config.venue,rate,intervalHours:interval&&interval>0?interval:null,markPrice:finite(p?.markPrice),volume24h:finite(volumes.get(s.symbol)),openInterestUsd:null,nextFundingTime:finite(p?.nextFundingTime),fetchedAt:p?.time||updatedAt,quoteAsset:s.quoteAsset,tradeUrl:config.tradeUrl(s.symbol),underlying:market==="HK"&&s.baseAsset==="GIGADEV"?"兆易创新 H 股 · HKEX 3986":undefined});
+    contracts.push({id:`${config.id}:${s.symbol}`,asset:s.baseAsset,symbol:s.symbol,name:(names as Record<string,string>)[s.baseAsset]||chinese||s.baseAsset,market,venue:config.venue,rate,intervalHours:interval&&interval>0?interval:null,markPrice:finite(p?.markPrice),volume24h:finite(volumes.get(s.symbol)),openInterestUsd:null,nextFundingTime:finite(p?.nextFundingTime),fetchedAt:p?.time||updatedAt,quoteAsset:s.quoteAsset,tradeUrl:config.tradeUrl(s.symbol),underlying:market==="HK"&&s.baseAsset==="GIGADEV"?"兆易创新 H 股 · HKEX 3986":undefined,...stockMetadata(s.baseAsset,market)});
    }
    const incomplete=contracts.some(c=>c.intervalHours===null||c.rate===null)||volume===null;
    const stale=contracts.some(c=>updatedAt-c.fetchedAt>300000);
