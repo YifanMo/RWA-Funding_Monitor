@@ -19,9 +19,9 @@ export function fundingSeries(points:HistoryPoint[]):FundingChartPoint[]{
 }
 
 /** Both percentage axes share the same pixel position for zero, while retaining their own scales. */
-export function fundingDomains(series:FundingChartPoint[]){
+export function fundingDomains(series:ReadonlyArray<{hourlyRatePercent:number|null;cumulativeRatePercent:number|null}>){
  const rates=series.map(p=>p.hourlyRatePercent).filter((r):r is number=>r!==null);
- const cumulative=series.map(p=>p.cumulativeRatePercent);
+ const cumulative=series.map(p=>p.cumulativeRatePercent).filter((r):r is number=>r!==null);
  const extent=(values:number[])=>({negative:Math.max(0,...values.map(v=>-v)),positive:Math.max(0,...values)});
  const a=extent(rates),b=extent(cumulative);
  const hasNegative=a.negative>0||b.negative>0,hasPositive=a.positive>0||b.positive>0;

@@ -6,6 +6,7 @@ import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { exchangeInfo } from "@/lib/exchanges/exchange-info";
 import type { Contract, Feed, HistoryPoint } from "@/lib/exchanges/types";
+import { CrossExchangeMonitor } from "@/components/cross-exchange-monitor";
 import { FundingHistoryChart } from "@/components/funding-history-chart";
 import { fundingSeries } from "@/lib/funding-history";
 import { inMarketScope, matchesStockQuery, stockIdentity, stockMetadata } from "@/lib/exchanges/stock-metadata";
@@ -28,6 +29,8 @@ const tone=(v:number|null)=>v===null?"neutral":v>=0?"positive":"negative";
 const time=(v:number|null)=>v?new Date(v).toLocaleTimeString("zh-CN",{hour12:false,timeZone:"Asia/Shanghai"}):"待同步";
 
 export default function Home(){
+ const [mode,setMode]=useState("term");
+ const openCross=useCallback(()=>{setVenue("all");setMode("cross");},[]);
  const [snapshot,setSnapshot]=useState<Snapshot|null>(null),[loading,setLoading]=useState(true),[fetchError,setFetchError]=useState("");
  const [market,setMarket]=useState("CN"),[venue,setVenue]=useState("all"),[query,setQuery]=useState(""),[sort,setSort]=useState("rate-desc");
  const [selected,setSelected]=useState("hyperliquid:xyz:CXMT"),[range,setRange]=useState("7"),[history,setHistory]=useState<HistoryPoint[]>([]),[historyLoading,setHistoryLoading]=useState(false),[historyError,setHistoryError]=useState("");
@@ -53,6 +56,7 @@ export default function Home(){
  const active=filtered.find(c=>c.id===selected)??filtered[0];
  const [historyMeta,setHistoryMeta]=useState({excludedSpecialCount:0,intervalMethod:""});
  useEffect(()=>{
+  if(mode!=="term")return;
   if(!active){setHistory([]);return;}let cancelled=false;const abort=new AbortController();
   setHistoryLoading(true);setHistoryError("");setHistory([]);setHistoryMeta({excludedSpecialCount:0,intervalMethod:""});
   (async()=>{
@@ -65,15 +69,15 @@ export default function Home(){
    if(!cancelled){setHistory(result.points);setHistoryMeta({excludedSpecialCount:result.excludedSpecialCount,intervalMethod:result.intervalMethod});}
   })().catch(()=>{if(!cancelled)setHistoryError("暂时无法读取该合约历史，请稍后重试");}).finally(()=>{if(!cancelled)setHistoryLoading(false);});
   return()=>{cancelled=true;abort.abort();};
- },[active?.id,range,lastRequest]);
- const stateRef=useRef({snapshot,market,venue,query,sort});stateRef.current={snapshot,market,venue,query,sort};
+ },[mode,active?.id,range,lastRequest]);
+ const stateRef=useRef({snapshot,market,venue,query,sort,mode});stateRef.current={snapshot,market,venue,query,sort,mode};
  useEffect(()=>{
   type Tool={name:string;title:string;description:string;inputSchema:object;annotations:{readOnlyHint:boolean;untrustedContentHint:boolean};execute:(input:unknown)=>unknown};
   const context=(document as unknown as {modelContext?:{registerTool:(tool:Tool,options:{signal:AbortSignal})=>void}}).modelContext;
   if(!context?.registerTool)return;const lifecycle=new AbortController();
   const register=(tool:Tool)=>{try{Promise.resolve(context.registerTool(tool,{signal:lifecycle.signal})).catch(()=>{});}catch{}};
-  register({name:"read_funding_monitor",title:"读取股票资金费率",description:"读取公开股票合约的费率、股票代码、实际市场和连接状态；aShareCode 表示港股合约的 A 股关联代码，A 股页会同时包含这些合约。",inputSchema:{type:"object",properties:{},additionalProperties:false},annotations:{readOnlyHint:true,untrustedContentHint:true},execute:()=>{const s=stateRef.current;return {feeds:s.snapshot?.feeds??[],filters:{market:s.market,venue:s.venue,query:s.query,sort:s.sort},contracts:s.snapshot?.contracts??[]};}});
-  register({name:"set_funding_filters",title:"筛选股票费率监控",description:"更新页面的市场、交易所或股票搜索筛选，不进行交易。",inputSchema:{type:"object",properties:{market:{type:"string",enum:["all","CN","HK","US"]},venue:{type:"string",enum:["all",...venues]},query:{type:"string"}},additionalProperties:false},annotations:{readOnlyHint:false,untrustedContentHint:false},execute:async input=>{if(!input||typeof input!=="object")throw Error("Invalid filters");const v=input as Record<string,unknown>;if(Object.keys(v).some(k=>!["market","venue","query"].includes(k))||v.market!==undefined&&!["all","CN","HK","US"].includes(String(v.market))||v.venue!==undefined&&!["all",...venues].includes(String(v.venue))||v.query!==undefined&&(typeof v.query!=="string"||v.query.length>100))throw Error("Invalid filters");if(v.market!==undefined)setMarket(String(v.market));if(v.venue!==undefined)setVenue(String(v.venue));if(v.query!==undefined)setQuery(String(v.query));await new Promise<void>(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve())));return {market:stateRef.current.market,venue:stateRef.current.venue,query:stateRef.current.query};}});
+  register({name:"read_funding_monitor",title:"读取股票资金费率",description:"读取公开股票合约的费率、股票代码、实际市场和连接状态；aShareCode 表示港股合约的 A 股关联代码，A 股页会同时包含这些合约。",inputSchema:{type:"object",properties:{},additionalProperties:false},annotations:{readOnlyHint:true,untrustedContentHint:true},execute:()=>{const s=stateRef.current;return {mode:s.mode,feeds:s.snapshot?.feeds??[],filters:{market:s.market,venue:s.venue,query:s.query,sort:s.sort},contracts:s.snapshot?.contracts??[]};}});
+  register({name:"set_funding_filters",title:"筛选股票费率监控",description:"打开期限套利页并更新市场、交易所或股票搜索筛选，不进行交易。",inputSchema:{type:"object",properties:{market:{type:"string",enum:["all","CN","HK","US"]},venue:{type:"string",enum:["all",...venues]},query:{type:"string"}},additionalProperties:false},annotations:{readOnlyHint:false,untrustedContentHint:false},execute:async input=>{if(!input||typeof input!=="object")throw Error("Invalid filters");const v=input as Record<string,unknown>;if(Object.keys(v).some(k=>!["market","venue","query"].includes(k))||v.market!==undefined&&!["all","CN","HK","US"].includes(String(v.market))||v.venue!==undefined&&!["all",...venues].includes(String(v.venue))||v.query!==undefined&&(typeof v.query!=="string"||v.query.length>100))throw Error("Invalid filters");setMode("term");if(v.market!==undefined)setMarket(String(v.market));if(v.venue!==undefined)setVenue(String(v.venue));if(v.query!==undefined)setQuery(String(v.query));await new Promise<void>(resolve=>requestAnimationFrame(()=>requestAnimationFrame(()=>resolve())));return {market:stateRef.current.market,venue:stateRef.current.venue,query:stateRef.current.query};}});
   return()=>lifecycle.abort();
  },[]);
  const unique=new Set(filtered.map(stockIdentity)).size;
@@ -89,6 +93,8 @@ export default function Home(){
   <div className="content"><div className="title-row"><div><div className="eyebrow">MARKET MONITOR <span>/ 01</span></div><h1>股票资金费率</h1><p className="intro">Hyperliquid · Binance · Aster</p></div><button className="refresh-button" onClick={refresh} disabled={loading}><RefreshCw size={15} className={loading?"spinning":""}/>{loading?"正在同步":"刷新数据"}</button></div>
   <div className="feed-strip">{venues.map(v=>{const f=snapshot?.feeds.find(f=>f.venue===v);return <button key={v} onClick={()=>setVenue(venue===v?"all":v)} className={`feed-card ${venue===v?"chosen":""}`} aria-pressed={venue===v}><span className={`venue-logo ${v.toLowerCase()}`}>{exchangeInfo.find(e=>e.venue===v)?.initial??v.slice(0,1)}</span><span className="feed-name">{v}<small>{f?f.status==="ok"?`${f.count} 个股票合约`:f.status==="partial"?"部分数据缺失":f.status==="stale"?"报价数据延迟":"暂时无法连接":"等待数据源"}</small></span><span className={`status-dot ${f?.status==="ok"?"ok":f?.status==="partial"||f?.status==="stale"?"partial":"waiting"}`}/></button>})}<div className="sync-meta"><span>每 1 小时更新</span><span>{loading?"读取交易所公开数据…":`${countdown} 分钟后刷新 · ${time(snapshot?.fetchedAt??null)}`}</span></div></div>
   {(fetchError||snapshot?.feeds.some(f=>f.status!=="ok"))&&<div className="notice" role="status">{fetchError||snapshot?.feeds.filter(f=>f.status!=="ok").map(f=>`${f.venue}：${f.error||"部分市场暂时不可用"}`).join("；")}。已成功读取的数据仍可查看。</div>}
+  <Tabs value={mode} onValueChange={setMode} className="strategy-tabs"><TabsList aria-label="套利研究视图"><TabsTrigger value="term">期限套利</TabsTrigger><TabsTrigger value="cross">跨交易所套利</TabsTrigger></TabsList></Tabs>
+  {mode==="term"&&<>
   <Tabs value={market} onValueChange={setMarket} className="market-tabs"><TabsList variant="line">{[["all","全部市场"],["CN","A 股"],["HK","港股"],["US","美股"]].map(([id,label])=><TabsTrigger value={id} key={id}>{label}<span className="tab-count">{snapshot?new Set(contracts.filter(c=>inMarketScope(c,id)).map(stockIdentity)).size:"—"}</span></TabsTrigger>)}</TabsList></Tabs>
   {market==="CN"&&<div className="scope-note"><Globe2 size={14}/><span>包含 A 股合约与 A/H 上市公司的港股合约；每行标明实际跟踪市场。</span></div>}
   <section className="stats" aria-label="当前筛选统计"><div><span>监控标的 <Globe2 size={14}/></span><strong>{snapshot?unique:"—"}<small> 个</small></strong><p>{snapshot?`${filtered.length} 个可交易合约` : "正在发现可交易股票合约"}</p></div><div><span>最高资金费率 <Activity size={14}/></span><strong className={tone(max)}>{pct(max)}<small> / 8h</small></strong><p>按当前费率等比换算</p></div><div><span>24h 合约成交额 <BarChart3 size={14}/></span><strong>{filtered.some(c=>c.volume24h!==null)?money(filtered.reduce((s,c)=>s+(c.volume24h??0),0)):"—"}</strong><p>{market==="all"?"全部市场":marketLabels[market as Market]} · {venue==="all"?"全部交易所":venue}</p></div></section>
@@ -100,6 +106,8 @@ export default function Home(){
   <section className="history-panel"><div className="chart-header"><div><div className="eyebrow">FUNDING HISTORY</div><h2>{active?`${active.asset} 资金费率历史`:"资金费率历史"}</h2><span className="subtle">{active?`${active.name} · ${active.venue} · ${active.symbol}`:"选择一个合约查看"} <span className="chart-unit">费率 + 累计</span></span>{active&&<div className="history-listing"><span>实际标的：{active.stockCode??"代码待核实"} · {marketLabels[active.market]}{active.aShareCode?" H 股":""}</span>{active.aShareCode&&<span>A 股关联：{active.aShareCode}</span>}</div>}</div><Tabs value={range} onValueChange={setRange}><TabsList>{[["1","24h"],["7","7 天"],["30","30 天"]].map(([v,l])=><TabsTrigger value={v} key={v}>{l}</TabsTrigger>)}</TabsList></Tabs></div>
    <div className="chart-layout"><div className="chart-area">{historyLoading?<div className="chart-empty"><RefreshCw size={20} className="spinning"/><span>读取资金费率历史…</span></div>:historyError?<div className="chart-empty"><Activity size={23}/><span>{historyError}</span></div>:history.length?<FundingHistoryChart points={history}/>:<div className="chart-empty"><Activity size={23}/><span>{active?"该合约暂无历史资金费率":"选择一个合约查看历史"}</span></div>}</div><div className="chart-summary"><span>当前预计费率</span><strong className={tone(active?.rate??null)}>{pct(active?.rate??null)}</strong><p>{active?.intervalHours?`每 ${active.intervalHours} 小时结算` : "结算周期待确认"}{active?.nextFundingTime?` · 下次 ${time(active.nextFundingTime)}`:""}</p><div className="summary-divider"/><span>所选区间平均 / 1h</span><strong className={tone(historyAvg)}>{pct(historyAvg)}</strong><p>{history.length} 条结算记录</p><div className="summary-divider"/><span>所选区间累计费率</span><strong className={tone(cumulativeRate)}>{pct(cumulativeRate)}</strong><p>正值多头支付 · 负值空头支付{historyMeta.excludedSpecialCount>0?` · 已排除 ${historyMeta.excludedSpecialCount} 条分红调整`:""}</p>{active&&<a href={active.tradeUrl} target="_blank" rel="noreferrer" className="trade-link">在 {active.venue} 查看 <ExternalLink size={13}/></a>}</div></div>
   </section>
+  </>}
+  <CrossExchangeMonitor contracts={contracts} visible={mode==="cross"} hasSnapshot={snapshot!==null} lastRequest={lastRequest} venue={venue} onOpen={openCross}/>
   <footer className="page-footer"><div><CircleHelp size={15}/><p>简单年化 = 原始费率 ÷ 结算小时 × 24 × 365。当前费率是预估值，历史曲线为已结算记录；除 Hyperliquid 外，历史周期按相邻结算时间推算，无法确认的记录不参与换算。<br/>按合约实际跟踪的上市市场标注；A 股页也展示 A/H 上市公司的港股合约，同一合约在全部市场只统计一次。标记价以报价币计，成交额按美元等值展示。</p></div><span>数据来自交易所公开 API</span></footer>
   </div>
  </main>;

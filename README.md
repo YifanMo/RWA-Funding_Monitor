@@ -33,6 +33,20 @@ A 股页同时展示实际 A 股合约，以及已核实在 A/H 股同时上市�
 
 `lib/exchanges/stock-listings.json` 保存按 `(market, asset)` 核实的代码、名称、来源及可选 `relatedA`。美股采用官方上市目录或合约公告；Hyperliquid 可从明确的上市引用中提取代码，新标的无法核实代码时显示“待核实”。港股 Class A 普通股、拟 A 股上市均不自动视为已经 A/H 双重上市。新增股票可在此目录补充代码和关联。
 
+## 跨交易所期货费率套利
+
+网站保留原有“期限套利”页，并新增“跨交易所套利”页。两页共享同一份股票范围、每小时刷新规则及 24h / 7 天 / 30 天历史窗口，不引入其他资产。跨交易所页默认查看全部市场，可按 A 股、港股、美股、交易所组合、股票代码和名称筛选。
+
+- 配对使用已核实的实际 `(market, stockCode)`，保留每份交易合约 ID；只连接不同交易所，不连接同一 Hyperliquid 内的不同 builder。不同股份类别、A 股与 H 股、ADR 与本土股不互配；A/H 关联仅控制市场页归属。
+- 当期预计费率先除以各自实际结算小时。空小时费率较高的一腿，多较低的一腿；毛差 = 空腿小时费率 − 多腿小时费率。两腿都为负时规则相同。按 8h 等效毛差排序，并可查看简单年化毛差和两腿较小的 24h 成交额。
+- 交易对 ID 按原合约排序固定，不随当前多空方向变化。缺失费率或周期不按零处理；零毛差只展示固定观察方向。每腿显示原始费率、实际周期、报价币及数据时间。
+- 历史仅为所选配对并行读取两腿，复用已有小时缓存。每条已结算费率按其观察到的结算周期分摊到覆盖的小时，仅比较两腿都完整覆盖的 UTC 小时；整条历史固定当前方向，不逐点取绝对值或假设无成本切换方向。
+- 累计差在两腿共同、完整的结算区间内，按原始结算事件求 `Σ空腿费率 − Σ多腿费率`。不是小时差积分，也不是账户实际美元收益。缺口断线后分段重新起算；存在多段时不提供跨缺口总累计。页面显示实际累计比较的起止及小时数，可能短于所选窗口。
+- 结算时间仅在整点 ±60 秒内对齐，未知周期、重叠期间或冲突记录不作为完整比较区间。Binance / Aster 历史周期仍按相邻普通结算时点推算；这一口径不能独立识别所有数据漏单。分红调整沿用原适配器的排除规则。
+- 费率差采用等名义本金口径，未包含手续费、基差、滑点、资金成本、合约乘数和汇率转换。港股合约可能分别跟踪港元股价与美元转换价，不能直接假定一比一数量对冲。此页展示候选配对，不执行交易。
+
+Binance 股票永续的利息基准项为零，不代表实际资金费率恒为零；不同 Hyperliquid HIP-3 builder 的利息项与 funding multiplier 也可能不同。计算使用 API 返回的当期报价和已结算记录，不硬编码默认基线。
+
 ## 新增交易所
 
 1. 在 `lib/exchanges/` 新建适配器，实现 `ExchangeAdapter` 的 `discover()` 和 `history(symbol, days)`。
@@ -67,10 +81,14 @@ node_modules/.bin/esbuild tests/funding-history.test.ts --bundle --platform=node
 node /tmp/rwa-funding-history-tests.mjs
 node_modules/.bin/esbuild tests/stock-metadata.test.ts --bundle --platform=node --format=esm --outfile=/tmp/rwa-stock-metadata-tests.mjs
 node /tmp/rwa-stock-metadata-tests.mjs
+node_modules/.bin/esbuild tests/cross-exchange.test.ts --bundle --platform=node --format=esm --outfile=/tmp/rwa-cross-exchange-tests.mjs
+node /tmp/rwa-cross-exchange-tests.mjs
 npm run build
 ```
 
 测试覆盖资金周期换算、A/H 股分类和关联筛选、代码前导零、合约别名、去重统计、ETF 排除、分红调整排除、历史周期变化、30 天分页、累计费率、双轴零线对齐与小时缓存。WebMCP 提供读取监控和设置筛选两个工具，只操作监控页面。
+
+跨交易所测试额外覆盖同股严格配对、稳定 ID、双负费率、多种结算周期、固定方向、共同覆盖、原始结算累计、跨块付款、冲突记录和缺口分段。WebMCP 新增读取跨交易所配对及设置其筛选两个工具；历史返回绑定配对、方向、区间和刷新时间，避免切换视图后误读旧历史。
 
 ## 官方来源
 
@@ -79,3 +97,6 @@ npm run build
 - [Binance Market Data](https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/rest-api/market-data)
 - [Aster 官方 API](https://github.com/asterdex/api-docs)
 - [Binance GIGADEV H 股公告](https://www.binance.com/en/support/announcement/detail/e8bfd0c5adaf4d8a880bb1b7327107ef)
+- [Binance TSM 股票永续规格](https://www.binance.com/en/support/announcement/detail/4cde981dc32d4268b7645e9d16e8d63a)
+- [XYZ 合约规格](https://docs.trade.xyz/perpetuals/specifications-and-schedules/specification-index)
+- [XYZ 资金费率公式调整](https://docs.trade.xyz/perpetuals/changelog/funding-rate-formula-updates)
