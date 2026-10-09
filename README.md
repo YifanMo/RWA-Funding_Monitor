@@ -48,6 +48,17 @@ A 股页同时展示实际 A 股合约，以及已核实在 A/H 股同时上市�
 
 Binance 股票永续的利息基准项为零，不代表实际资金费率恒为零；不同 Hyperliquid HIP-3 builder 的利息项与 funding multiplier 也可能不同。计算使用 API 返回的当期报价和已结算记录，不硬编码默认基线。
 
+## 表格筛选与历史年化排序
+
+两个 tab 的表格默认按所选窗口的历史年化毛收益降序排列，上方可选择 24 小时 / 7 天 / 30 天；与选中行下方历史图共享窗口、原始数据及计算口径。点击表头切换升序或降序，原排序下拉已移除；支持股票代码、当期费率/年化、历史年化和成交额等列。未知、读取失败和非有限值在两个方向都排最后，数值并列按稳定 ID 排列，历史负收益保留负号。
+
+成交额筛选包含不限、前 50%、前 20% 和严格大于 $1M。先应用市场、交易所/组合和搜索，再计算有效成交额的比例门槛，包含门槛并列（可能超过选定比例）；期限页按合约行，跨交易所页按配对行，使用两腿较小的 24h 成交额。缺失或无效成交额不参与比例与固定金额筛选，成交额筛选先于历史读取和表头排序。
+
+历史批量读取只针对筛选后需要的唯一合约，每个合约/小时读取一份 30 天记录并在浏览器共享成功结果和进行中的请求；1/7/30 天窗口在本地推导，切窗口、点击表头和跨 tab 复用数据。全局最多 3 个历史读取、每个场所最多 1 个。Hyperliquid 新合约读取开始间隔至少 5 秒，Binance/Aster 为 300ms，以放缓冷扫描；这不代表能保证所有访客共享出口的限额。首次大范围加载可能较慢，可先缩小成交额范围。页面显示加载进度和失败数量；未完成时排名仍在更新，失败仅在显式重试或新小时再次读取。选中行在后续出队时优先，切筛选后的旧任务只填共享缓存，不写新范围的表格。
+
+原始历史缓存按整点清理，上限 512 个结果 / 250,000 个点。表格跨所年化复用小时比较的轻量摘要缓存，只有选中配对计算完整结算累计曲线。两腿读取时间不一致时以较早的 fetchedAt 作为共同窗口终点；历史年化计算并不直接相减两腿各自年化。分红排除数量来自原始 30 天记录，界面明确标注该口径。
+
+
 ## 新增交易所
 
 1. 在 `lib/exchanges/` 新建适配器，实现 `ExchangeAdapter` 的 `discover()` 和 `history(symbol, days)`。
@@ -85,6 +96,8 @@ node_modules/.bin/esbuild tests/stock-metadata.test.ts --bundle --platform=node 
 node /tmp/rwa-stock-metadata-tests.mjs
 node_modules/.bin/esbuild tests/cross-exchange.test.ts --bundle --platform=node --format=esm --outfile=/tmp/rwa-cross-exchange-tests.mjs
 node /tmp/rwa-cross-exchange-tests.mjs
+node_modules/.bin/esbuild tests/table-history.test.ts --bundle --platform=node --format=esm --define:import.meta.env.DEV=false --outfile=/tmp/rwa-table-history-tests.mjs
+node /tmp/rwa-table-history-tests.mjs
 npm run build
 ```
 
@@ -92,9 +105,12 @@ npm run build
 
 跨交易所测试额外覆盖同股严格配对、稳定 ID、双负费率、多种结算周期、固定方向、共同覆盖、原始结算累计、跨块付款、冲突记录和缺口分段。历史年化测试覆盖三个时间窗口、按结算时长加权、负值、零值、未知周期以及覆盖小时与完整结算时长的区别。WebMCP 新增读取跨交易所配对及设置其筛选两个工具；历史返回绑定配对、方向、区间和刷新时间，避免切换视图后误读旧历史。
 
+表格测试覆盖比例基数与边界并列、严格 $1M 条件、负值及缺失值排序、三个历史窗口、表格/图表一致性、方向翻转、按合约去重、小时缓存、全局/场所并发、节奏控制和显式失败重试。WebMCP 筛选增加 days 和 volumeFilter，读取结果包含历史年化及加载状态。
+
 ## 官方来源
 
 - [Hyperliquid Perpetuals API](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals)
+- [Hyperliquid API Rate Limits](https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/rate-limits-and-user-limits)
 - [Hyperliquid Funding](https://hyperliquid.gitbook.io/hyperliquid-docs/trading/funding)
 - [Binance Market Data](https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/rest-api/market-data)
 - [Aster 官方 API](https://github.com/asterdex/api-docs)

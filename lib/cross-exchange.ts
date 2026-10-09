@@ -38,7 +38,8 @@ export function pairCombination(pair:FundingPair):string{return JSON.stringify([
 export function pairInScope(pair:FundingPair,market:string):boolean{return inMarketScope(pair.a,market)||inMarketScope(pair.b,market);}
 export function pairMatchesQuery(pair:FundingPair,query:string):boolean{return matchesStockQuery(pair.a,query)||matchesStockQuery(pair.b,query);}
 export function pairLiquidity(pair:FundingPair):number|null{
- return pair.a.volume24h!==null&&pair.b.volume24h!==null?Math.min(pair.a.volume24h,pair.b.volume24h):null;
+ const valid=(v:number|null)=>v!==null&&Number.isFinite(v)&&v>=0;
+ return valid(pair.a.volume24h)&&valid(pair.b.volume24h)?Math.min(pair.a.volume24h!,pair.b.volume24h!):null;
 }
 
 const HOUR=3600000;
@@ -67,7 +68,7 @@ export interface PairHistory {
 }
 
 /** Uniformly allocate settled rates to covered hours, then compare only complete shared hours. */
-export function compareFundingHistory(shortPoints:HistoryPoint[],longPoints:HistoryPoint[],start:number,end:number):PairHistory{
+function hourlyComparison(shortPoints:HistoryPoint[],longPoints:HistoryPoint[],start:number,end:number){
  const from=Math.ceil(start/HOUR)*HOUR,to=Math.floor(end/HOUR)*HOUR;
  const short=settlements(shortPoints,end),long=settlements(longPoints,end);
  const coverage=(rows:Settlement[])=>{
@@ -87,6 +88,20 @@ export function compareFundingHistory(shortPoints:HistoryPoint[],longPoints:Hist
   const ah=a.values.get(time),bh=b.values.get(time);
   points.push({time,hourlyRatePercent:ah!==undefined&&ah!==null&&bh!==undefined&&bh!==null?(ah-bh)*100:null,cumulativeRatePercent:null,shortHourlyPercent:ah==null?null:ah*100,longHourlyPercent:bh==null?null:bh*100});
  }
+ return {from,to,short,long,a,b,points};
+}
+function rateSummary(points:PairHistoryPoint[]){
+ const differences=points.flatMap(p=>p.hourlyRatePercent===null?[]:[p.hourlyRatePercent/100]);
+ const averageHourlySpread=differences.length?differences.reduce((sum,r)=>sum+r,0)/differences.length:null;
+ return {comparedHours:differences.length,averageHourlySpread,annualizedGrossReturn:annualizedFundingRate(averageHourlySpread)};
+}
+/** Table summaries skip the full cash-settlement curve, while sharing exactly its hourly comparison. */
+export function compareFundingRateSummary(shortPoints:HistoryPoint[],longPoints:HistoryPoint[],start:number,end:number){
+ return rateSummary(hourlyComparison(shortPoints,longPoints,start,end).points);
+}
+/** Uniformly allocate settled rates to covered hours, then compare only complete shared hours. */
+export function compareFundingHistory(shortPoints:HistoryPoint[],longPoints:HistoryPoint[],start:number,end:number):PairHistory{
+ const {from,to,short,long,a,b,points}=hourlyComparison(shortPoints,longPoints,start,end);
  const byTime=new Map(points.map(p=>[p.time,p]));
  const shared=[...a.boundaries].filter(t=>t>=from&&t<=to&&b.boundaries.has(t)).sort((x,y)=>x-y);
  let cumulative=0,correction=0,previousEnd:number|null=null,segments=0,settledHours=0,periodStart:number|null=null,periodEnd:number|null=null;
@@ -118,7 +133,5 @@ export function compareFundingHistory(shortPoints:HistoryPoint[],longPoints:Hist
   }
   settledHours+=(finish-begin)/HOUR;previousEnd=finish;periodEnd=finish;
  }
- const differences=points.flatMap(p=>p.hourlyRatePercent===null?[]:[p.hourlyRatePercent/100]);
- const averageHourlySpread=differences.length?differences.reduce((sum,r)=>sum+r,0)/differences.length:null;
- return {points,comparedHours:differences.length,settledHours,segments,averageHourlySpread,annualizedGrossReturn:annualizedFundingRate(averageHourlySpread),cumulativeSpread:segments===1?cumulative:null,periodStart,periodEnd};
+ return {points,...rateSummary(points),settledHours,segments,cumulativeSpread:segments===1?cumulative:null,periodStart,periodEnd};
 }

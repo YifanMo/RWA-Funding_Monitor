@@ -2,6 +2,16 @@ import type {HistoryResult} from "./types";
 const HOUR=3600000;
 const stored=new Map<string,{value:HistoryResult;expiresAt:number}>();
 const pending=new Map<string,Promise<HistoryResult>>();
+function remember(key:string,value:HistoryResult,expiresAt:number,now:number){
+ for(const [k,entry] of stored)if(entry.expiresAt<=now)stored.delete(k);
+ // Bounded raw history memory, enough for one complete stock universe without keeping old hour buckets.
+ const pointBudget=250000;
+ let points=[...stored.values()].reduce((sum,entry)=>sum+entry.value.points.length,0);
+ while(stored.size&&(stored.size>=512||points+value.points.length>pointBudget)){
+  const oldest=stored.keys().next().value!;points-=stored.get(oldest)!.value.points.length;stored.delete(oldest);
+ }
+ stored.set(key,{value,expiresAt});
+}
 
 /** A stable hour bucket caches a whole history result, preserving its original fetchedAt timestamp. */
 export async function cachedHistory(venueId:string,symbol:string,days:number,load:()=>Promise<HistoryResult>,now=Date.now()):Promise<HistoryResult>{
@@ -16,11 +26,10 @@ export async function cachedHistory(venueId:string,symbol:string,days:number,loa
   const cacheKey=new Request(`https://rwa-cache.invalid/history-v2/${hash}`);
   try{
    const result=await edge?.match(cacheKey);
-   if(result){const value=await result.json() as HistoryResult;stored.set(key,{value,expiresAt});return value;}
+   if(result){const value=await result.json() as HistoryResult;remember(key,value,expiresAt,now);return value;}
   }catch{}
   const value=await load();
-  if(stored.size>=180)stored.delete(stored.keys().next().value!);
-  stored.set(key,{value,expiresAt});
+  remember(key,value,expiresAt,now);
   const ttl=Math.max(1,Math.floor((expiresAt-Date.now())/1000));
   try{await edge?.put(cacheKey,new Response(JSON.stringify(value),{headers:{"Content-Type":"application/json","Cache-Control":`public, max-age=${ttl}`}}));}catch{}
   return value;
