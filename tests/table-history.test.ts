@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import {compareTableValues,filterByVolume,nextTableSort} from "../lib/table-controls";
-import {historyWindow,termHistoryMetric,pairHistoryMetric} from "../lib/historical-table";
+import {historyWindow,termHistoryMetric,pairHistoryMetric,termHistoryMetrics,pairHistoryMetrics,historicalSortWindow,HISTORY_WINDOWS} from "../lib/historical-table";
 import {compareFundingHistory,fundingPairs,pairLiquidity} from "../lib/cross-exchange";
 import {HistoryClient} from "../lib/history-client";
 import type {Contract,HistoryResult} from "../lib/exchanges/types";
@@ -31,6 +31,25 @@ for(const days of [1,7,30]){
  assert.ok(Math.abs(pairHistoryMetric(long,short,days).annualizedGrossReturn!+summary.annualizedGrossReturn!)<1e-12);
 }
 assert.ok(termHistoryMetric(short,1).annualizedRate!>0);assert.ok(termHistoryMetric(short,30).annualizedRate!<0);
+// Each parallel column has its own ranking; the chart's selected window cannot determine the sort key.
+const profile=(early:number,week:number,day:number):HistoryResult=>({...short,points:short.points.map((point,i)=>({...point,rate:i<552?early:i<696?week:day}))});
+const profiles=[{id:"A",data:profile(-.00003,0,.00002)},{id:"B",data:profile(0,.00001,-.00001)},{id:"C",data:profile(.00002,-.00002,0)},{id:"missing",data:null}];
+const termRows=profiles.map(row=>({id:row.id,metrics:row.data?termHistoryMetrics(row.data):null}));
+const pairRows=profiles.map(row=>({id:row.id,metrics:row.data?pairHistoryMetrics(row.data,long):null}));
+const expected={1:["A","C","B","missing"],7:["B","A","C","missing"],30:["C","B","A","missing"]};
+for(const window of HISTORY_WINDOWS){
+ const days=historicalSortWindow(window.column)!;assert.equal(days,window.days);
+ const byTerm=[...termRows].sort((a,b)=>compareTableValues(a.metrics?.[days].annualizedRate??null,b.metrics?.[days].annualizedRate??null,"desc",a.id,b.id));
+ const byPair=[...pairRows].sort((a,b)=>compareTableValues(a.metrics?.[days].annualizedGrossReturn??null,b.metrics?.[days].annualizedGrossReturn??null,"desc",a.id,b.id));
+ assert.deepEqual(byTerm.map(row=>row.id),expected[days]);assert.deepEqual(byPair.map(row=>row.id),expected[days]);
+ const ascending=[...termRows].sort((a,b)=>compareTableValues(a.metrics?.[days].annualizedRate??null,b.metrics?.[days].annualizedRate??null,"asc",a.id,b.id));
+ assert.deepEqual(ascending.map(row=>row.id),[...expected[days].slice(0,3).reverse(),"missing"]);
+ for(const row of termRows)if(row.metrics)assert.equal(row.metrics[days].sampleHours,days*24);
+ const next=nextTableSort({key:window.column,direction:"desc"},window.column);assert.equal(next.direction,"asc");assert.equal(next.key,window.column);
+}
+assert.equal(historicalSortWindow("historical-14"),undefined);
+assert.equal(historicalSortWindow("volume"),undefined);
+assert.equal(termHistoryMetrics(short)[7],termHistoryMetric(short,7));assert.equal(pairHistoryMetrics(short,long)[30],pairHistoryMetric(short,long,30));
 const contract=(id:string,venue:string):Contract=>({id,venue,symbol:id,stockCode:"TSM",asset:"TSM",name:"台积电",market:"US",rate:0,intervalHours:8,markPrice:100,volume24h:1e6,openInterestUsd:null,nextFundingTime:null,fetchedAt:1,quoteAsset:"USD",tradeUrl:"https://example.com"});
 assert.equal(pairLiquidity(fundingPairs([contract("a","A"),{...contract("b","B"),volume24h:NaN}])[0]),null);
 let active=0,max=0,calls=0;const running=new Set<string>();

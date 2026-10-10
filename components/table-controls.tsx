@@ -10,6 +10,3 @@ export function SortableHead({label,column,sort,onSort,numeric=false,text=false}
 export function VolumeFilterSelect({value,onChange,pair=false}:{value:VolumeFilter;onChange:(v:VolumeFilter)=>void;pair?:boolean}){
  return <Select value={value} onValueChange={v=>onChange(v as VolumeFilter)}><SelectTrigger aria-label={pair?"较小腿24小时成交额筛选":"24小时成交额筛选"}><SelectValue/></SelectTrigger><SelectContent><SelectItem value="all">24h 成交额 · 不限</SelectItem><SelectItem value="top50">24h 成交额 · 前 50%</SelectItem><SelectItem value="top20">24h 成交额 · 前 20%</SelectItem><SelectItem value="over1m">24h 成交额 · &gt; $1M</SelectItem></SelectContent></Select>;
 }
-export function HistoryWindowSelect({value,onChange}:{value:string;onChange:(v:string)=>void}){
- return <Select value={value} onValueChange={onChange}><SelectTrigger aria-label="历史年化时间窗口"><SelectValue/></SelectTrigger><SelectContent><SelectItem value="1">历史年化 · 24 小时</SelectItem><SelectItem value="7">历史年化 · 7 天</SelectItem><SelectItem value="30">历史年化 · 30 天</SelectItem></SelectContent></Select>;
-}

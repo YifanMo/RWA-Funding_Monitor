@@ -1,6 +1,9 @@
 import type {HistoryResult,HistoryPoint} from "./exchanges/types";
 import {historicalFundingSummary} from "./funding-history";
 import {compareFundingRateSummary} from "./cross-exchange";
+export const HISTORY_WINDOWS=[{days:1,label:"24h",column:"historical-1"},{days:7,label:"7 天",column:"historical-7"},{days:30,label:"30 天",column:"historical-30"}] as const;
+export type HistoryDays=typeof HISTORY_WINDOWS[number]["days"];
+export function historicalSortWindow(column:string):HistoryDays|undefined{return HISTORY_WINDOWS.find(window=>window.column===column)?.days;}
 export function historyWindow(result:HistoryResult,days:number):HistoryPoint[]{
  const start=result.fetchedAt-days*86400000;
  return result.points.filter(p=>p.time>start&&p.time<=result.fetchedAt);
@@ -17,3 +20,5 @@ export function pairHistoryMetric(short:HistoryResult,long:HistoryResult,days:nu
  let ranges=longCache.get(long);if(!ranges){ranges=new Map();longCache.set(long,ranges);}
  let metric=ranges.get(days);if(!metric){const end=Math.min(short.fetchedAt,long.fetchedAt);metric=compareFundingRateSummary(short.points,long.points,end-days*86400000,end);ranges.set(days,metric);}return metric;
 }
+export function termHistoryMetrics(result:HistoryResult){return {1:termHistoryMetric(result,1),7:termHistoryMetric(result,7),30:termHistoryMetric(result,30)};}
+export function pairHistoryMetrics(short:HistoryResult,long:HistoryResult){return {1:pairHistoryMetric(short,long,1),7:pairHistoryMetric(short,long,7),30:pairHistoryMetric(short,long,30)};}
