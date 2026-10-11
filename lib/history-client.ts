@@ -1,12 +1,13 @@
 import type {Contract,HistoryResult} from "./exchanges/types";
+export type HistoryContract=Pick<Contract,"id"|"symbol"|"venue">;
 type Job={venue:string;run:()=>Promise<void>};
 type Entry={promise:Promise<HistoryResult>;status:"pending"|"ready"|"error"};
 /** One shared 30-day read per contract/hour, max three reads and one read per venue. */
 export class HistoryClient{
  private entries=new Map<string,Entry>();private queue:Job[]=[];private active=0;private venues=new Set<string>();
  private started=new Map<string,number>();private timer:ReturnType<typeof setTimeout>|null=null;
- constructor(private loader:(contract:Contract)=>Promise<HistoryResult>,private concurrency=3,private intervals:Record<string,number>={}){}
- read(contract:Contract,hour:number,retry=false):Promise<HistoryResult>{
+ constructor(private loader:(contract:HistoryContract)=>Promise<HistoryResult>,private concurrency=3,private intervals:Record<string,number>={}){}
+ read(contract:HistoryContract,hour:number,retry=false):Promise<HistoryResult>{
   const key=JSON.stringify([hour,contract.id]),existing=this.entries.get(key);
   if(existing&&!(retry&&existing.status==="error"))return existing.promise;
   // Hour rollover removes completed old entries; in-flight reads remain shared until they finish.
@@ -43,7 +44,7 @@ export class HistoryClient{
 }
 const directVenues=new Map<string,number>();
 export function resetHistoryFallback(){directVenues.clear();}
-async function loadHistory(contract:Contract):Promise<HistoryResult>{
+async function loadHistory(contract:HistoryContract):Promise<HistoryResult>{
  const hour=Math.floor(Date.now()/3600000);
  if(directVenues.get(contract.venue)!==hour){
   const abort=new AbortController(),timeout=setTimeout(()=>abort.abort(),30000);
@@ -61,4 +62,4 @@ async function loadHistory(contract:Contract):Promise<HistoryResult>{
  return directHistory(contract.venue,contract.symbol,30);
 }
 // 30-day HL funding reads usually need two weighted pages; pace cold scans, while cache hits remain instant.
-export const historyClient=new HistoryClient(loadHistory,3,{Hyperliquid:5000,Binance:300,Aster:300});
+export const historyClient=new HistoryClient(loadHistory,3,{Hyperliquid:5000,Binance:1200,Aster:300});

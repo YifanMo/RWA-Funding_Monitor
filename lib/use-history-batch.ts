@@ -1,9 +1,9 @@
 "use client";
 import {useEffect,useRef,useState} from "react";
-import type {Contract,HistoryResult} from "./exchanges/types";
-import {historyClient,resetHistoryFallback} from "./history-client";
+import type {HistoryResult} from "./exchanges/types";
+import {historyClient,resetHistoryFallback,type HistoryContract} from "./history-client";
 export type HistoryRead={data:HistoryResult|null;error:string};
-export function useHistoryBatch(contracts:Contract[],enabled:boolean,lastRequest:number,priorityIds:string[]=[]){
+export function useHistoryBatch(contracts:HistoryContract[],enabled:boolean,lastRequest:number,priorityIds:string[]=[]){
  const hour=Math.floor(lastRequest/3600000);
  const ids=[...new Set(contracts.map(c=>c.id))].sort();
  const key=JSON.stringify([hour,ids]);
@@ -17,8 +17,8 @@ export function useHistoryBatch(contracts:Contract[],enabled:boolean,lastRequest
   const retryFailures=retryRef.current!==retry;retryRef.current=retry;
   const unique=[...new Map(contractsRef.current.map(c=>[c.id,c])).values()];
   // Alternate venues so one large market doesn't block every other venue behind it.
-  const groups=new Map<string,Contract[]>();for(const c of unique)groups.set(c.venue,[...(groups.get(c.venue)??[]),c]);
-  const queue:Contract[]=[];while([...groups.values()].some(g=>g.length))for(const g of groups.values()){const c=g.shift();if(c)queue.push(c);}
+  const groups=new Map<string,HistoryContract[]>();for(const c of unique)groups.set(c.venue,[...(groups.get(c.venue)??[]),c]);
+  const queue:HistoryContract[]=[];while([...groups.values()].some(g=>g.length))for(const g of groups.values()){const c=g.shift();if(c)queue.push(c);}
   setState({key,rows:{}});
   const worker=async()=>{while(!cancelled&&queue.length){
    const index=queue.findIndex(c=>priorityRef.current.includes(c.id));

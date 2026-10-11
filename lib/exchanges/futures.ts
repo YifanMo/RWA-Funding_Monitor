@@ -29,7 +29,7 @@ export function futuresAdapter(config:FuturesConfig):ExchangeAdapter{
   },
   async history(symbol,days){
    const end=Date.now(),start=end-days*86400000;let cursor=start-86400000;
-   type Row={fundingTime:number;fundingRate:string;rateType?:string};
+   type Row={fundingTime:number;fundingRate:string;rateType?:string;markPrice?:string};
    const rows:Row[]=[];let complete=false;
    for(let page=0;page<5;page++){
     const batch=await get<Row[]>(`fundingRate?symbol=${encodeURIComponent(symbol)}&startTime=${cursor}&endTime=${end}&limit=1000`,120);
@@ -52,7 +52,8 @@ export function futuresAdapter(config:FuturesConfig):ExchangeAdapter{
     const hours=rounded&&[1,2,4,8].includes(rounded)&&Math.abs(rawHours!-rounded)<.02?rounded:null;
     points.push({time:r.fundingTime,rate,intervalHours:hours});
    }
-   return {points,fetchedAt:end,excludedSpecialCount:special.length,intervalMethod:"observed-settlement-spacing"};
+   const specialFunding=special.flatMap(r=>{const rate=finite(r.fundingRate);return rate===null?[]:[{time:r.fundingTime,rate,rateType:r.rateType!,markPrice:finite(r.markPrice)}];});
+   return {points,fetchedAt:end,excludedSpecialCount:special.length,intervalMethod:"observed-settlement-spacing",specialFunding};
   }
  };
 }

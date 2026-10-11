@@ -6,9 +6,9 @@ function remember(key:string,value:HistoryResult,expiresAt:number,now:number){
  for(const [k,entry] of stored)if(entry.expiresAt<=now)stored.delete(k);
  // Bounded raw history memory, enough for one complete stock universe without keeping old hour buckets.
  const pointBudget=250000;
- let points=[...stored.values()].reduce((sum,entry)=>sum+entry.value.points.length,0);
- while(stored.size&&(stored.size>=512||points+value.points.length>pointBudget)){
-  const oldest=stored.keys().next().value!;points-=stored.get(oldest)!.value.points.length;stored.delete(oldest);
+ let points=[...stored.values()].reduce((sum,entry)=>sum+entry.value.points.length+(entry.value.specialFunding?.length??0),0);
+ while(stored.size&&(stored.size>=512||points+value.points.length+(value.specialFunding?.length??0)>pointBudget)){
+  const oldest=stored.keys().next().value!;points-=stored.get(oldest)!.value.points.length+(stored.get(oldest)!.value.specialFunding?.length??0);stored.delete(oldest);
  }
  stored.set(key,{value,expiresAt});
 }
@@ -23,7 +23,7 @@ export async function cachedHistory(venueId:string,symbol:string,days:number,loa
   const edge=(globalThis as unknown as {caches?:{default:Cache}}).caches?.default;
   const digest=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(key));
   const hash=Array.from(new Uint8Array(digest)).map(n=>n.toString(16).padStart(2,"0")).join("");
-  const cacheKey=new Request(`https://rwa-cache.invalid/history-v2/${hash}`);
+  const cacheKey=new Request(`https://rwa-cache.invalid/history-v3/${hash}`);
   try{
    const result=await edge?.match(cacheKey);
    if(result){const value=await result.json() as HistoryResult;remember(key,value,expiresAt,now);return value;}

@@ -6,6 +6,7 @@ import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { exchangeInfo } from "@/lib/exchanges/exchange-info";
 import type { Contract, Feed } from "@/lib/exchanges/types";
+import { DividendMonitor } from "@/components/dividend-monitor";
 import { CrossExchangeMonitor } from "@/components/cross-exchange-monitor";
 import { FundingHistoryChart } from "@/components/funding-history-chart";
 import { fundingSeries, historicalFundingSummary } from "@/lib/funding-history";
@@ -97,7 +98,7 @@ export default function Home(){
   <div className="content"><div className="title-row"><div><div className="eyebrow">MARKET MONITOR <span>/ 01</span></div><h1>股票资金费率</h1><p className="intro">Hyperliquid · Binance · Aster</p></div><button className="refresh-button" onClick={refresh} disabled={loading}><RefreshCw size={15} className={loading?"spinning":""}/>{loading?"正在同步":"刷新数据"}</button></div>
   <div className="feed-strip">{venues.map(v=>{const f=snapshot?.feeds.find(f=>f.venue===v);return <button key={v} onClick={()=>setVenue(venue===v?"all":v)} className={`feed-card ${venue===v?"chosen":""}`} aria-pressed={venue===v}><span className={`venue-logo ${v.toLowerCase()}`}>{exchangeInfo.find(e=>e.venue===v)?.initial??v.slice(0,1)}</span><span className="feed-name">{v}<small>{f?f.status==="ok"?`${f.count} 个股票合约`:f.status==="partial"?"部分数据缺失":f.status==="stale"?"报价数据延迟":"暂时无法连接":"等待数据源"}</small></span><span className={`status-dot ${f?.status==="ok"?"ok":f?.status==="partial"||f?.status==="stale"?"partial":"waiting"}`}/></button>})}<div className="sync-meta"><span>每 1 小时更新</span><span>{loading?"读取交易所公开数据…":`${countdown} 分钟后刷新 · ${time(snapshot?.fetchedAt??null)}`}</span></div></div>
   {(fetchError||snapshot?.feeds.some(f=>f.status!=="ok"))&&<div className="notice" role="status">{fetchError||snapshot?.feeds.filter(f=>f.status!=="ok").map(f=>`${f.venue}：${f.error||"部分市场暂时不可用"}`).join("；")}。已成功读取的数据仍可查看。</div>}
-  <Tabs value={mode} onValueChange={setMode} className="strategy-tabs"><TabsList aria-label="套利研究视图"><TabsTrigger value="term">期限套利</TabsTrigger><TabsTrigger value="cross">跨交易所套利</TabsTrigger></TabsList></Tabs>
+  <Tabs value={mode} onValueChange={setMode} className="strategy-tabs"><TabsList aria-label="套利研究视图"><TabsTrigger value="term">期限套利</TabsTrigger><TabsTrigger value="cross">跨交易所套利</TabsTrigger><TabsTrigger value="dividends">股息特殊费率</TabsTrigger></TabsList></Tabs>
   {mode==="term"&&<>
   <Tabs value={market} onValueChange={setMarket} className="market-tabs"><TabsList variant="line">{[["all","全部市场"],["CN","A 股"],["HK","港股"],["US","美股"]].map(([id,label])=><TabsTrigger value={id} key={id}>{label}<span className="tab-count">{snapshot?new Set(contracts.filter(c=>inMarketScope(c,id)).map(stockIdentity)).size:"—"}</span></TabsTrigger>)}</TabsList></Tabs>
   {market==="CN"&&<div className="scope-note"><Globe2 size={14}/><span>包含 A 股合约与 A/H 上市公司的港股合约；每行标明实际跟踪市场。</span></div>}
@@ -115,6 +116,7 @@ export default function Home(){
   </section>
   </>}
   <CrossExchangeMonitor contracts={contracts} visible={mode==="cross"} hasSnapshot={snapshot!==null&&!loading&&lastRequest>0} lastRequest={lastRequest} venue={venue} onOpen={openCross}/>
+  <DividendMonitor visible={mode==="dividends"} lastRequest={lastRequest} now={now}/>
   <footer className="page-footer"><div><CircleHelp size={15}/><p>简单年化 = 原始费率 ÷ 结算小时 × 24 × 365。当前费率是预估值，历史曲线为已结算记录；除 Hyperliquid 外，历史周期按相邻结算时间推算，无法确认的记录不参与换算。<br/>按合约实际跟踪的上市市场标注；A 股页也展示 A/H 上市公司的港股合约，同一合约在全部市场只统计一次。标记价以报价币计，成交额按美元等值展示。</p></div><span>数据来自交易所公开 API</span></footer>
   </div>
  </main>;

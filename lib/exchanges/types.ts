@@ -10,7 +10,8 @@ export interface Contract {
 export interface Feed { venue:Venue; status:"ok"|"partial"|"error"|"stale"; count:number; fetchedAt:number|null; error?:string }
 export interface MarketResult { contracts:Contract[]; feed:Feed }
 export interface HistoryPoint { time:number; rate:number; intervalHours:number|null }
-export interface HistoryResult { points:HistoryPoint[]; fetchedAt:number; excludedSpecialCount:number; intervalMethod:string }
+export interface SpecialFunding { time:number; rate:number; rateType:string; markPrice:number|null }
+export interface HistoryResult { points:HistoryPoint[]; fetchedAt:number; excludedSpecialCount:number; intervalMethod:string; specialFunding?:SpecialFunding[] }
 /** Implement both methods and add the adapter to registry.ts to connect another venue. */
 export interface ExchangeAdapter {
  id:string; venue:Venue; discover():Promise<MarketResult>;
