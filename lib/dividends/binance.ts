@@ -5,7 +5,7 @@ import {stockMetadata} from "../exchanges/stock-metadata";
 import {dividendCatalog,CATALOG_VERIFIED_AT,type DividendMarket} from "./catalog";
 import type {DividendContract} from "./model";
 export type DividendAnnouncement={id:string;title:string;publishedAt:number;url:string};
-export type DividendSnapshot={contracts:DividendContract[];universeError:string;announcements:DividendAnnouncement[];announcementsError:string;announcementScanned:number;announcementLimit:number;fetchedAt:number;catalogVerifiedAt:string;events:typeof dividendCatalog};
+export type DividendSnapshot={contracts:DividendContract[];universeError:string;announcements:DividendAnnouncement[];announcementsError:string;announcementScanned:number;announcementLimit:number;fetchedAt:number;catalogVerifiedAt:string;events:typeof dividendCatalog;announcementOldestAt?:number;announcementLatestAt?:number};
 export function dividendContract(symbol:SymbolInfo):DividendContract|null {
  const mapping:Record<string,DividendMarket>={CN_EQUITY:"CN",HK_EQUITY:"HK",EQUITY:"US",KR_EQUITY:"KR"};
  const market=mapping[symbol.underlyingType];
@@ -27,9 +27,9 @@ export async function readDividendAnnouncements(){
   if(result.code!=="000000"||!result.success||!catalog||!Array.isArray(catalog.articles))throw Error("官方公告暂时不可用");
   rows.push(...catalog.articles);if(catalog.articles.length<50||rows.length>=catalog.total)break;
  }
- return {announcements:dividendAnnouncements(rows),scanned:rows.length};
+ return {announcements:dividendAnnouncements(rows),scanned:rows.length,oldestAt:rows.length?Math.min(...rows.map(r=>r.releaseDate)):0,latestAt:rows.length?Math.max(...rows.map(r=>r.releaseDate)):0};
 }
 export async function readBinanceDividends():Promise<DividendSnapshot>{
  const [universe,news]=await Promise.allSettled([readDividendUniverse(),readDividendAnnouncements()]);
- return {contracts:universe.status==="fulfilled"?universe.value:[],universeError:universe.status==="rejected"?message(universe.reason):"",announcements:news.status==="fulfilled"?news.value.announcements:[],announcementsError:news.status==="rejected"?message(news.reason):"",announcementScanned:news.status==="fulfilled"?news.value.scanned:0,announcementLimit:100,fetchedAt:Date.now(),catalogVerifiedAt:CATALOG_VERIFIED_AT,events:dividendCatalog};
+ return {contracts:universe.status==="fulfilled"?universe.value:[],universeError:universe.status==="rejected"?message(universe.reason):"",announcements:news.status==="fulfilled"?news.value.announcements:[],announcementsError:news.status==="rejected"?message(news.reason):"",announcementScanned:news.status==="fulfilled"?news.value.scanned:0,announcementLimit:100,fetchedAt:Date.now(),catalogVerifiedAt:CATALOG_VERIFIED_AT,events:dividendCatalog,...(news.status==="fulfilled"?{announcementOldestAt:news.value.oldestAt,announcementLatestAt:news.value.latestAt}:{})};
 }
