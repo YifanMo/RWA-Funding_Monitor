@@ -999,7 +999,19 @@
     "asset": "SKHY",
     "market": "US",
     "code": "SKHY",
-    "source": "https://api.hyperliquid.xyz/info"
+    "name": "SK 海力士 ADR",
+    "source": "https://www.skhynix.com/ir/UI-FR-IR03/",
+    "sources": [
+      "https://api.ondoperps.xyz/v1/markets/info/SKHY-USD.P",
+      "https://api.ondoperps.xyz/v1/markets",
+      "https://www.skhynix.com/ir/UI-FR-IR03/",
+      "https://api.hyperliquid.xyz/info",
+      "https://fapi.binance.com/fapi/v1/exchangeInfo",
+      "https://fapi.asterdex.com/fapi/v1/exchangeInfo"
+    ],
+    "shareClass": "Nasdaq ADR / ADS",
+    "isin": "US78392B2060",
+    "note": "2026-10-17 核实：Ondo SKHY-USD.P 合约详情明确 underlyingName=SK HYNIX INC - ADR、ticker=SKHY、symbol=SKHYon。发行人列示 Nasdaq SKHY ADR，10 ADS 对应 1 股 KRX 000660 普通股（KR7000660001）；与旧 Luxembourg GDR（US78392B1070）不同。仅与 Hyperliquid xyz:SKHY、Binance SKHYUSDT、Aster SKHYUSDT 的同一美国 ADR 配对，不与 SKHYNIX 韩国普通股合约配对。"
   },
   {
     "asset": "SMCI",

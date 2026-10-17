@@ -65,7 +65,9 @@ TradeXYZ (`xyz`) 官方规则没有固定的现金股息补偿，经济影响由
 
 通过官方公开 REST API 接入现有两个套利页：`/v1/markets` 动态发现股票类别与底层交易日历，`/v1/perps/contracts` 读取可交易状态、下一期预测费率、美元成交额及持仓量，`/v1/perps/mark_prices` 读取真正的标记价和报价时间。底层股票休市（`isClosed`）仍可交易；`disabled=true` 合约不纳入。仅减仓合约暂不作为可开仓候选，并在连接状态提示。CN/HK/US 分类结合官方 Stock 标签和上海／香港／纽约交易日历，排除 ETF、指数、商品、外汇、加密货币、预上市及现货；日韩市场不扩展到普通三市场页。
 
-股票代码复用已核实的上市目录，ADR 和 A/H 股保持独立。SKHY 的场所特定存托股身份尚未核实，暂不纳入并在连接状态提示；新股票缺少已核实证券代码时仍可观察费率，但不自动跨所配对。2026-10-17 接入实测为 39 个三市场股票合约，数量以后端实时在架接口为准，不固定这一清单。
+股票代码复用已核实的上市目录，ADR 和 A/H 股保持独立。新股票缺少已核实证券代码时仍可观察费率，但不自动跨所配对。2026-10-17 加入 SKHY 后实测为 40 个三市场股票合约，数量以后端实时在架接口为准，不固定这一清单。
+
+`SKHY-USD.P` 已通过 [Ondo 精确合约详情](https://api.ondoperps.xyz/v1/markets/info/SKHY-USD.P) 核实为 `SK HYNIX INC - ADR`，ticker `SKHY`、token symbol `SKHYon`；[发行人上市资料](https://www.skhynix.com/ir/UI-FR-IR03/)对应 Nasdaq ADR / ADS，ISIN `US78392B2060`，10 ADS = 1 股 KRX `000660` 普通股。页面归美股，显示“SK 海力士 ADR”和代码 `SKHY`。该合约与 Hyperliquid `xyz:SKHY`、Binance `SKHYUSDT`、Aster `SKHYUSDT` 共用 `US:SKHY` 配对身份，新增三组 Ondo 跨所配对。Ondo `SKHYNIX-USD.P`、其他场所的 `SKHYNIX` 韩国普通股合约和旧 Luxembourg GDR 均不混配。SKHY 的精确合约／底层 market／美元报价／纽约日历需保持一致，合约详情每小时复核 ADR 身份；失败或变更时仅暂停 SKHY 纳入与配对并提示，其他 Ondo 股票继续读取。
 
 Ondo 按 UTC 整点后的首个 tick 每小时结算。当前使用 `nextFundingRate`，历史使用 `funding_rate_history` 中的已结算 fraction，均原样作为 1h 费率；不再除以 8 或重复乘 `fundingRateMultiplier`。理论利息基准不替代实时费率。历史按 `pageInfo.nextCursor` 完整翻页、保留负值、缺失小时不补零；24h / 7 天 / 30 天三列、累计曲线和跨所差值复用同一份 30 天历史。实测单次 `limit=1000` 可取得 720 个小时样本，分页有上限和重复游标保护。公开读取按场所串行、请求启动至少间隔 1100ms，并复用公共响应及小时历史缓存。
 

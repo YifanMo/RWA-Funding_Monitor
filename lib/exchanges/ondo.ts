@@ -4,8 +4,8 @@ import {publicJson} from "./http";
 import {finite,type Contract,type ExchangeAdapter,type HistoryPoint,type Market} from "./types";
 
 const API="https://api.ondoperps.xyz";
-const HOUR=3600000;
 export type OndoMarket={market:string;underlyingMarket?:string;longName?:string;pair:{base:string;quote:string};tags?:string[];disabled?:boolean;schedule?:{timezone?:string}};
+type StockIdentity={symbol?:string;ticker?:string;underlyingName?:string};
 type Ticker={market:string;productType:string;contractType:string;baseCurrency:string;quoteCurrency:string;disabled:boolean;nextFundingRate?:string;nextFundingRateTimestamp?:string;usdVolume?:string;openInterestUsd?:string;reduceOnly?:boolean};
 type Mark={markPrice?:string;lastUpdatedTime?:string};
 type Envelope<T>={success:boolean;result:T;error?:string;pageInfo?:{nextCursor?:string}};
@@ -29,8 +29,9 @@ function get<T>(path:string,ttl=45):Promise<Envelope<T>>{
 /** Official category + underlying trading calendar; never classify all USD quotes as US stocks. */
 export function classifyOndo(row:OndoMarket):Market|null{
  if(row.disabled||!row.tags?.includes("Stock")||row.tags.some(t=>["ETF","Index","Commodity","Crypto","FX","Pre-IPO","Private Market"].includes(t)))return null;
- // This ticker's depositary-share identity still needs venue-specific verification.
- if(row.pair.base==="SKHY")return null;
+ // SKHY is the Nasdaq ADR; SKHYNIX is a separate Korean ordinary-share contract.
+ // A renamed or remapped market must be reviewed before reusing the ADR pairing key.
+ if(row.pair.base==="SKHY"&&(row.market!=="SKHY-USD.P"||row.underlyingMarket!=="SKHY-USD"||row.pair.quote!=="USD"||row.schedule?.timezone!=="America/New_York"))return null;
  const zones:Record<string,Market>={"America/New_York":"US","Asia/Shanghai":"CN","Asia/Hong_Kong":"HK"};
  return zones[row.schedule?.timezone??""]??null;
 }
@@ -45,14 +46,20 @@ export const ondo:ExchangeAdapter={
   ]);
   if(!Array.isArray(config.result?.perps?.tradingPairs)||!Array.isArray(live.result))throw Error("Ondo Perps 合约目录格式异常");
   const metadata=new Map(config.result.perps.tradingPairs.map(m=>[m.market,m]));
+  const skhy=metadata.get("SKHY-USD.P");
+  const skhyListed=skhy&&classifyOndo(skhy)==="US"&&live.result.some(r=>r.market===skhy.market&&r.disabled===false&&r.productType==="perpetual"&&r.contractType==="linear"&&!r.reduceOnly);
+  // Revalidate the exact perp's official ADR identity hourly; do not substitute its KRX sibling on failure.
+  const identity=skhyListed?(await get<StockIdentity>("/v1/markets/info/SKHY-USD.P",3600).catch(()=>null))?.result:null;
+  const skhyVerified=identity?.symbol==="SKHYon"&&identity?.ticker==="SKHY"&&typeof identity?.underlyingName==="string"&&identity.underlyingName.trim().toUpperCase()==="SK HYNIX INC - ADR";
   const fetchedAt=Date.now(),contracts:Contract[]=[];let unverified=0,restricted=0;
   for(const row of live.result){
    const info=metadata.get(row.market);
    if(!info||row.disabled!==false||row.productType!=="perpetual"||row.contractType!=="linear")continue;
-   if(info.tags?.includes("Stock")&&info.pair.base==="SKHY")unverified++;
-   const market=classifyOndo(info);if(!market)continue;
+   const market=classifyOndo(info);
+   if(!market){if(info.tags?.includes("Stock")&&info.pair.base==="SKHY")unverified++;continue;}
    if(row.baseCurrency!==info.pair.base||!row.market.endsWith(".P"))continue;
    if(row.reduceOnly){restricted++;continue;}
+   if(info.pair.base==="SKHY"&&!skhyVerified){unverified++;continue;}
    const mark=marks?.result?.[row.market],sourceTime=mark?.lastUpdatedTime?Date.parse(mark.lastUpdatedTime):NaN;
    const next=row.nextFundingRateTimestamp?Date.parse(row.nextFundingRateTimestamp):NaN;
    const listing=stockMetadata(row.baseCurrency,market);
@@ -60,7 +67,7 @@ export const ondo:ExchangeAdapter={
     // API fractions are already hourly and include the configured funding multiplier.
     rate:finite(row.nextFundingRate),intervalHours:1,markPrice:Number.isFinite(sourceTime)?finite(mark?.markPrice):null,volume24h:finite(row.usdVolume),openInterestUsd:finite(row.openInterestUsd),nextFundingTime:Number.isFinite(next)?next:null,
     fetchedAt:Number.isFinite(sourceTime)?Math.min(sourceTime,fetchedAt):fetchedAt,quoteAsset:row.quoteCurrency,tradeUrl:`https://app.ondoperps.xyz/trade/perps/${encodeURIComponent(row.market)}`,
-    underlying:info.longName||row.baseCurrency,kind:"stock",...listing});
+    underlying:row.baseCurrency==="SKHY"?"SK Hynix ADR / ADS · Nasdaq: SKHY · 1 ADS = 0.1 股 KRX: 000660 普通股":info.longName||row.baseCurrency,kind:"stock",...listing});
   }
   const issues:string[]=[];
   if(unverified)issues.push(`${unverified} 个股票上市标的待核实，暂未纳入`);

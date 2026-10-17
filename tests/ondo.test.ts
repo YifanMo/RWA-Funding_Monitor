@@ -12,7 +12,7 @@ const metadata=(base:string,timezone="America/New_York",tags=["Stock"]):OndoMark
  pair:{base,quote:"USD"},tags,schedule:{timezone},
 });
 
-// Currency alone cannot identify the listing market, nor can an ambiguous depositary symbol.
+// Currency alone cannot identify the listing market; SKHY must retain its verified ADR mapping.
 assert.equal(classifyOndo(metadata("AAPL")),"US");
 assert.equal(classifyOndo(metadata("CXMT","Asia/Shanghai")),"CN");
 assert.equal(classifyOndo(metadata("MINIMAX","Asia/Hong_Kong")),"HK");
@@ -25,7 +25,13 @@ assert.equal(classifyOndo({...metadata("AAPL"),tags:undefined}),null);
 assert.equal(classifyOndo({...metadata("AAPL"),schedule:undefined}),null);
 assert.equal(classifyOndo(metadata("SMSN","Asia/Seoul")),null);
 assert.equal(classifyOndo(metadata("SKHYNIX","Asia/Seoul")),null);
-assert.equal(classifyOndo(metadata("SKHY")),null);
+assert.equal(classifyOndo(metadata("SKHY")),"US");
+for(const changed of [
+ {...metadata("SKHY"),market:"SKHY-OTHER.P"},
+ {...metadata("SKHY"),underlyingMarket:"SKHYNIX-USD"},
+ {...metadata("SKHY"),pair:{base:"SKHY",quote:"KRW"}},
+ metadata("SKHY","Asia/Seoul"),
+])assert.equal(classifyOndo(changed),null);
 
 const configs=[
  metadata("AAPL"),metadata("TSM"),metadata("BABA"),metadata("TSLA"),
@@ -71,6 +77,8 @@ const history=Array.from({length:720},(_,age)=>({
 })).filter((_,age)=>age!==110);
 const requests:URL[]=[];
 const originalFetch=globalThis.fetch;
+const originalNow=Date.now;
+let identityResponse="adr";
 globalThis.fetch=async(input)=>{
  const url=new URL(input instanceof Request?input.url:String(input));requests.push(url);
  assert.equal(url.origin,"https://api.ondoperps.xyz");
@@ -78,6 +86,11 @@ globalThis.fetch=async(input)=>{
  if(url.pathname==="/v1/markets")return success({perps:{tradingPairs:configs}});
  if(url.pathname==="/v1/perps/contracts")return success(live);
  if(url.pathname==="/v1/perps/mark_prices")return success(marks);
+ if(url.pathname==="/v1/markets/info/SKHY-USD.P"){
+  if(identityResponse==="unavailable")return new Response("Unavailable",{status:503});
+  if(identityResponse==="malformed")return success({symbol:"SKHYon",ticker:"SKHY",underlyingName:123});
+  return success(identityResponse==="adr"?{symbol:"SKHYon",ticker:"SKHY",underlyingName:"SK HYNIX INC - ADR"}:{symbol:"SKHYNIXon",ticker:"SKHYNIX",underlyingName:"SK HYNIX INC"});
+ }
  assert.equal(url.pathname,"/v1/perps/funding_rate_history");
  const symbol=url.searchParams.get("market")!;
  assert.equal(url.searchParams.get("limit"),"1000");
@@ -97,7 +110,7 @@ globalThis.fetch=async(input)=>{
 
 try{
  const discovered=await ondo.discover();
- assert.deepEqual(discovered.contracts.map(c=>c.asset).sort(),["AAPL","BABA","CXMT","MINIMAX","TSM","UNITREE","UNVERIFIED","ZHIPU"].sort());
+ assert.deepEqual(discovered.contracts.map(c=>c.asset).sort(),["AAPL","BABA","CXMT","MINIMAX","SKHY","TSM","UNITREE","UNVERIFIED","ZHIPU"].sort());
  const byAsset=new Map(discovered.contracts.map(c=>[c.asset,c]));
  const apple=byAsset.get("AAPL")!;
  assert.equal(apple.venue,"Ondo Perps");assert.equal(apple.intervalHours,1);
@@ -112,12 +125,12 @@ try{
  const missing=byAsset.get("UNVERIFIED")!;
  assert.equal(missing.rate,null);assert.equal(missing.markPrice,null);assert.equal(missing.volume24h,null);
  assert.equal(missing.openInterestUsd,null);assert.equal(missing.nextFundingTime,null);assert.equal(missing.stockCode,undefined);
- assert.equal(discovered.feed.status,"partial");assert.equal(discovered.feed.count,8);
- assert.match(discovered.feed.error!,/待核实/);assert.match(discovered.feed.error!,/缺失/);
+ assert.equal(discovered.feed.status,"partial");assert.equal(discovered.feed.count,9);
+ assert.doesNotMatch(discovered.feed.error!,/待核实/);assert.match(discovered.feed.error!,/缺失/);
 
  // Keep exact listings and leading zeroes: ADRs do not join a company's local shares.
  const expectedListings:Record<string,[Contract["market"],string]>={
-  AAPL:["US","AAPL"],TSM:["US","TSM"],BABA:["US","BABA"],
+  AAPL:["US","AAPL"],TSM:["US","TSM"],BABA:["US","BABA"],SKHY:["US","SKHY"],
   CXMT:["CN","688825.SH"],UNITREE:["CN","688836.SH"],MINIMAX:["HK","00100.HK"],ZHIPU:["HK","02513.HK"],
  };
  for(const [asset,[market,stockCode]] of Object.entries(expectedListings)){
@@ -130,6 +143,17 @@ try{
  assert.equal(fundingPairs([tsm,{...tsm,id:"other:2330",venue:"Other venue",market:"CN",stockCode:"2330"}]).length,0);
  assert.equal(fundingPairs([baba,{...baba,id:"other:9988",venue:"Other venue",market:"HK",stockCode:"09988.HK"}]).length,0);
  assert.equal(fundingPairs([missing,{...missing,id:"other:unknown",venue:"Other venue"}]).length,0);
+ const skhy=byAsset.get("SKHY")!;
+ assert.match(skhy.name,/ADR/);assert.match(skhy.underlying!,/1 ADS = 0\.1 股 KRX: 000660/);
+ const counterparts=[
+  {...skhy,id:"hyperliquid:xyz:SKHY",venue:"Hyperliquid",symbol:"xyz:SKHY"},
+  {...skhy,id:"binance:SKHYUSDT",venue:"Binance",symbol:"SKHYUSDT",intervalHours:4},
+  {...skhy,id:"aster:SKHYUSDT",venue:"Aster",symbol:"SKHYUSDT",intervalHours:8},
+ ];
+ const skhyPairs=fundingPairs([skhy,...counterparts,{...skhy,id:"other:krx",venue:"Other venue",asset:"SKHYNIX",stockCode:"000660.KS"}]);
+ assert.equal(skhyPairs.length,6);
+ assert.equal(skhyPairs.filter(p=>p.a.id===skhy.id||p.b.id===skhy.id).length,3);
+ assert.ok(skhyPairs.every(p=>p.stockKey==="US:SKHY"&&p.a.asset==="SKHY"&&p.b.asset==="SKHY"));
 
  const result=await ondo.history(historySymbol,30);
  assert.equal(result.points.length,719);assert.equal(result.intervalMethod,"exchange-hourly");assert.equal(result.excludedSpecialCount,0);
@@ -161,6 +185,19 @@ try{
   await assert.rejects(ondo.history(invalid,1),/无效/);
  }
  assert.equal(requests.length,requestsBeforeInvalid);
-}finally{globalThis.fetch=originalFetch;}
+ // Hourly identity refresh must fail closed if the venue remaps the underlying or the source fails.
+ for(const [offset,response] of [[3600001,"ordinary"],[7200002,"unavailable"],[10800003,"malformed"]] as const){
+  Date.now=()=>originalNow()+offset;identityResponse=response;
+  const changed=await ondo.discover();
+  assert.equal(changed.contracts.some(c=>c.asset==="SKHY"),false);
+  assert.equal(changed.contracts.some(c=>c.asset==="AAPL"),true);
+  assert.match(changed.feed.error!,/上市标的待核实/);
+ }
+ Date.now=()=>originalNow()+14400004;row("SKHY").reduceOnly=true;
+ const restricted=await ondo.discover();
+ assert.equal(restricted.contracts.some(c=>c.asset==="SKHY"),false);
+ assert.match(restricted.feed.error!,/2 个合约当前仅减仓/);
+ assert.doesNotMatch(restricted.feed.error!,/上市标的待核实/);
+}finally{globalThis.fetch=originalFetch;Date.now=originalNow;}
 
 console.log("PASS: Ondo public market filters, actual listing identities and cross-venue pairs, predicted hourly fractions, mark prices, missing data, 30-day cursor pagination, deduplication, unfilled gaps, 24h/7d/30d annualization, conflicting records and invalid cursors");
