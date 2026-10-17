@@ -62,4 +62,4 @@ async function loadHistory(contract:HistoryContract):Promise<HistoryResult>{
  return directHistory(contract.venue,contract.symbol,30);
 }
 // 30-day HL funding reads usually need two weighted pages; pace cold scans, while cache hits remain instant.
-export const historyClient=new HistoryClient(loadHistory,3,{Hyperliquid:5000,Binance:1200,Aster:300});
+export const historyClient=new HistoryClient(loadHistory,3,{Hyperliquid:5000,Binance:1200,Aster:300,"Ondo Perps":1100});

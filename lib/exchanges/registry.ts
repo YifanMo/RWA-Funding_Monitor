@@ -2,10 +2,11 @@ import {cachedHistory} from "./history-cache";
 import {hyperliquid} from "./hyperliquid";
 import {binance} from "./binance";
 import {aster} from "./aster";
+import {ondo} from "./ondo";
 import {message} from "./http";
 import type {ExchangeAdapter,Contract,Feed} from "./types";
 /** Register another venue here; dashboard and HTTP endpoints consume this common interface. */
-export const adapters:ExchangeAdapter[]=[hyperliquid,binance,aster];
+export const adapters:ExchangeAdapter[]=[hyperliquid,binance,aster,ondo];
 type Snapshot={contracts:Contract[];feeds:Feed[];fetchedAt:number};
 let current:Snapshot|null=null;
 let pending:Promise<Snapshot>|null=null;

@@ -10,7 +10,8 @@ export function publicFeedPreview():Plugin {
     const allowed=target.protocol==="https:"&&!target.username&&!target.password&&!target.port&&(
      target.hostname==="api.hyperliquid.xyz"&&target.pathname==="/info"||
      ["fapi.binance.com","fapi.asterdex.com"].includes(target.hostname)&&/^\/fapi\/v1\/(exchangeInfo|premiumIndex|fundingInfo|fundingRate|ticker\/24hr)$/.test(target.pathname)||
-     target.hostname==="www.binance.com"&&target.pathname==="/bapi/composite/v1/public/cms/article/list/query");
+     target.hostname==="www.binance.com"&&target.pathname==="/bapi/composite/v1/public/cms/article/list/query"||
+     target.hostname==="api.ondoperps.xyz"&&/^\/v1\/(markets|perps\/(contracts|mark_prices|funding_rate_history))$/.test(target.pathname));
     if(!allowed){res.statusCode=400;res.end("Invalid public feed");return;}
     let body="";for await(const chunk of req){body+=chunk;if(body.length>8192)throw Error("Request too large");}
     const result=await nodeFetch(target,{dispatcher,method:req.method??"GET",headers:{"Content-Type":"application/json"},...(body?{body}:{}),signal:AbortSignal.timeout(20000)});

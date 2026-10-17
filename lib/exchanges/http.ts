@@ -15,7 +15,7 @@ export async function publicJson<T=unknown>(url:string,body?:unknown,ttl=45):Pro
   try{const cached=await edge?.match(cacheKey);if(cached){const value=await cached.json();memory.set(key,{value,expires:Date.now()+ttl*1000});return value as T;}}catch{}
   const abort=new AbortController();const timeout=setTimeout(()=>abort.abort(),25000);
   try{
-   const target=import.meta.env.DEV&&typeof window==="undefined"?`http://127.0.0.1:5173/__dev_public_feed?url=${encodeURIComponent(url)}`:url;
+   const target=import.meta.env.DEV&&typeof window==="undefined"?`http://127.0.0.1:${import.meta.env.VITE_PUBLIC_FEED_PREVIEW_PORT??"5173"}/__dev_public_feed?url=${encodeURIComponent(url)}`:url;
    const r=await fetch(target,{method:body?"POST":"GET",headers:body?{"Content-Type":"application/json"}:{Accept:"application/json"},body:body?JSON.stringify(body):undefined,signal:abort.signal});
    if(!r.ok)throw Error(`上游接口 HTTP ${r.status}`);
    const value=await r.json();

@@ -1,29 +1,17 @@
 # RWA Funding
 
-股票永续合约资金费率监控网站。按 A 股、港股、美股分类，接入 Hyperliquid HIP-3、Binance USDⓈ-M TradFi、Aster Pro。
-
-当前网站：[RWA Funding Monitor](https://rwa-funding-monitor.q961017025.chatgpt.site/)。网站访问权限由 Sites 管理。
-
-技术栈：React 19、TypeScript、Vinext / Vite、Cloudflare Workers、Recharts。本仓库保存当前网站源码；推送 GitHub 不会自动部署 Sites。
+股票永续合约资金费率监控网站。按 A 股、港股、美股分类，接入 Hyperliquid HIP-3、Binance USDⓈ-M TradFi、Aster Pro、Ondo Perps。
 
 ## 本地运行
 
-需要 Node.js ≥ 22.13。克隆仓库后安装锁定的依赖：
-
 ```sh
-git clone https://github.com/YifanMo/RWA-Funding_Monitor.git
-cd RWA-Funding_Monitor
-npm ci
+npm install
 npm run dev
 ```
 
 默认预览地址为 http://127.0.0.1:5173。页面打开后立即同步，之后每 1 小时刷新一次；没有自动交易或账户密钥。交易所 `TRADING` 状态表示市场在架，个人账户权限仍以交易所为准。
 
-页面刷新与云端任务分开运行。关闭页面会停止网页计时器；已关联的 ChatGPT 云端计划可独立检查股息事件和发送提醒，不依赖本机在线。计划与提醒状态在 Scheduled 管理；D1 保存按登录用户隔离的去重账本。标的范围仍从交易所公开列表发现。
-
 本地预览通过 `build/public-feed-preview.ts` 使用系统已有的 HTTP/HTTPS 代理读取公开行情。这仅用于开发环境，生产 Worker 直接读取官方 API；当生产出口无法访问某平台时，浏览器会尝试公开接口直连。Aster 历史接口没有 CORS，需网站服务端可访问其官方接口。
-
-`.openai/hosting.json` 保留现有 Sites 项目绑定，供构建使用，不包含 API 密钥。`build/` 和 `scripts/` 是构建与本地运行所需源码；依赖、构建产物、本地运行状态和 `.env*` 文件均不提交。
 
 ## 股票代码与 A 股关联
 
@@ -54,7 +42,7 @@ Binance 股票永续的利息基准项为零，不代表实际资金费率恒为
 
 成交额筛选包含不限、前 50%、前 20% 和严格大于 $1M。先应用市场、交易所/组合和搜索，再计算有效成交额的比例门槛，包含门槛并列（可能超过选定比例）；期限页按合约行，跨交易所页按配对行，使用两腿较小的 24h 成交额。缺失或无效成交额不参与比例与固定金额筛选，成交额筛选先于历史读取和表头排序。
 
-历史批量读取只针对筛选后需要的唯一合约，每个合约/小时读取一份 30 天记录并在浏览器共享成功结果和进行中的请求；1/7/30 天窗口在本地推导，切窗口、点击表头和跨 tab 复用数据。全局最多 3 个历史读取、每个场所最多 1 个。Hyperliquid 新合约读取开始间隔至少 5 秒，Binance 为 1200ms、Aster 为 300ms，以放缓冷扫描；这不代表能保证所有访客共享出口的限额。首次大范围加载可能较慢，可先缩小成交额范围。页面显示加载进度和失败数量；未完成时排名仍在更新，失败仅在显式重试或新小时再次读取。选中行在后续出队时优先，切筛选后的旧任务只填共享缓存，不写新范围的表格。
+历史批量读取只针对筛选后需要的唯一合约，每个合约/小时读取一份 30 天记录并在浏览器共享成功结果和进行中的请求；1/7/30 天窗口在本地推导，切窗口、点击表头和跨 tab 复用数据。全局最多 3 个历史读取、每个场所最多 1 个。Hyperliquid 新合约读取开始间隔至少 5 秒，Binance 为 1200ms、Aster 为 300ms、Ondo Perps 为 1100ms，以放缓冷扫描；这不代表能保证所有访客共享出口的限额。首次大范围加载可能较慢，可先缩小成交额范围。页面显示加载进度和失败数量；未完成时排名仍在更新，失败仅在显式重试或新小时再次读取。选中行在后续出队时优先，切筛选后的旧任务只填共享缓存，不写新范围的表格。
 
 原始历史缓存按整点清理，上限 512 个结果 / 250,000 个点。表格跨所年化复用小时比较的轻量摘要缓存，只有选中配对计算完整结算累计曲线。两腿读取时间不一致时以较早的 fetchedAt 作为共同窗口终点；历史年化计算并不直接相减两腿各自年化。分红排除数量来自原始 30 天记录，界面明确标注该口径。
 
@@ -72,6 +60,16 @@ Binance 股票永续的利息基准项为零，不代表实际资金费率恒为
 TradeXYZ (`xyz`) 官方规则没有固定的现金股息补偿，经济影响由价格与市场 funding 体现；不能推广到所有 HIP-3 builder。Aevo 的同类特殊股息规则尚未核实，当前不接入事件扫描，也不宣称没有。每条规则和公司资料均可从页面跳转官方原文。
 
 公开事件接口：`GET /api/dividends`，返回日历、在架范围、近期公告、各来源错误和时间。浏览器服务端访问失败后尝试公开数据直连，不保证上游始终可达。浏览器 WebMCP 增加 `read_dividend_monitor`，明确返回部分覆盖和非自动公司日历口径。
+
+## Ondo Perps
+
+通过官方公开 REST API 接入现有两个套利页：`/v1/markets` 动态发现股票类别与底层交易日历，`/v1/perps/contracts` 读取可交易状态、下一期预测费率、美元成交额及持仓量，`/v1/perps/mark_prices` 读取真正的标记价和报价时间。底层股票休市（`isClosed`）仍可交易；`disabled=true` 合约不纳入。仅减仓合约暂不作为可开仓候选，并在连接状态提示。CN/HK/US 分类结合官方 Stock 标签和上海／香港／纽约交易日历，排除 ETF、指数、商品、外汇、加密货币、预上市及现货；日韩市场不扩展到普通三市场页。
+
+股票代码复用已核实的上市目录，ADR 和 A/H 股保持独立。SKHY 的场所特定存托股身份尚未核实，暂不纳入并在连接状态提示；新股票缺少已核实证券代码时仍可观察费率，但不自动跨所配对。2026-10-17 接入实测为 39 个三市场股票合约，数量以后端实时在架接口为准，不固定这一清单。
+
+Ondo 按 UTC 整点后的首个 tick 每小时结算。当前使用 `nextFundingRate`，历史使用 `funding_rate_history` 中的已结算 fraction，均原样作为 1h 费率；不再除以 8 或重复乘 `fundingRateMultiplier`。理论利息基准不替代实时费率。历史按 `pageInfo.nextCursor` 完整翻页、保留负值、缺失小时不补零；24h / 7 天 / 30 天三列、累计曲线和跨所差值复用同一份 30 天历史。实测单次 `limit=1000` 可取得 720 个小时样本，分页有上限和重复游标保护。公开读取按场所串行、请求启动至少间隔 1100ms，并复用公共响应及小时历史缓存。
+
+本次仅接入普通资金费率；股息特殊费率页继续按已核实的 Binance 规则运行。
 
 ## 新增交易所
 
@@ -104,6 +102,8 @@ TradeXYZ (`xyz`) 官方规则没有固定的现金股息补偿，经济影响由
 npx tsc --noEmit --incremental false
 node_modules/.bin/esbuild tests/exchanges.test.ts --bundle --platform=node --format=esm --define:import.meta.env.DEV=false --outfile=/tmp/rwa-exchange-tests.mjs
 node /tmp/rwa-exchange-tests.mjs
+node_modules/.bin/esbuild tests/ondo.test.ts --bundle --platform=node --format=esm --define:import.meta.env.DEV=false --outfile=/tmp/rwa-ondo-tests.mjs
+node /tmp/rwa-ondo-tests.mjs
 node_modules/.bin/esbuild tests/funding-history.test.ts --bundle --platform=node --format=esm --outfile=/tmp/rwa-funding-history-tests.mjs
 node /tmp/rwa-funding-history-tests.mjs
 node_modules/.bin/esbuild tests/stock-metadata.test.ts --bundle --platform=node --format=esm --outfile=/tmp/rwa-stock-metadata-tests.mjs
@@ -128,6 +128,9 @@ npm run build
 - [Hyperliquid Funding](https://hyperliquid.gitbook.io/hyperliquid-docs/trading/funding)
 - [Binance Market Data](https://developers.binance.com/en/docs/catalog/core-trading-derivatives-trading-usd-s-m-futures/api/rest-api/market-data)
 - [Aster 官方 API](https://github.com/asterdex/api-docs)
+- [Ondo Perps 公开 API](https://docs.ondoperps.xyz/api-reference/market-data/get-contracts)
+- [Ondo Perps 历史费率 API](https://docs.ondoperps.xyz/api-reference/funding-rate/get-funding-rate-history)
+- [Ondo Perps 资金费率规则](https://docs.ondoperps.xyz/funding-rates)
 - [Binance GIGADEV H 股公告](https://www.binance.com/en/support/announcement/detail/e8bfd0c5adaf4d8a880bb1b7327107ef)
 - [Binance TSM 股票永续规格](https://www.binance.com/en/support/announcement/detail/4cde981dc32d4268b7645e9d16e8d63a)
 - [XYZ 合约规格](https://docs.trade.xyz/perpetuals/specifications-and-schedules/specification-index)
